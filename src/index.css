@@ -1,171 +1,28 @@
 @import "tailwindcss";
-
-:root {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  color-scheme: dark;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #04060a;
-  color: #f3f4f6;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* Custom Glassmorphism Utilities tailored to the Faceted Logo Palette */
-.glass-panel {
-  background: rgba(8, 12, 20, 0.82);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(139, 92, 246, 0.18);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75);
-}
-
-.glass-card {
-  background: rgba(11, 16, 26, 0.65);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.glass-beveled {
-  background: linear-gradient(135deg, rgba(17, 24, 39, 0.8) 0%, rgba(8, 12, 20, 0.95) 100%);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(139, 92, 246, 0.25);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.glass-card-hover {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glass-card-hover:hover {
-  transform: translateY(-4px);
-  border-color: rgba(139, 92, 246, 0.45);
-  box-shadow: 0 16px 36px -10px rgba(139, 92, 246, 0.28);
-}
-
-.glass-glow-purple {
-  box-shadow: 0 0 50px -5px rgba(139, 92, 246, 0.4);
-}
-
-.glass-glow-emerald {
-  box-shadow: 0 0 45px -5px rgba(16, 185, 129, 0.35);
-}
-
-.font-mono {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-}
-
-/* Hologram Orbital Rings */
-.hologram-ring {
-  border: 1px solid rgba(139, 92, 246, 0.22);
-  box-shadow: 0 0 40px rgba(139, 92, 246, 0.12), inset 0 0 40px rgba(139, 92, 246, 0.12);
-}
-
-.hologram-ring-dashed {
-  border: 1px dashed rgba(99, 102, 241, 0.3);
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.1);
-}
-
-/* Dynamic Floating & Orbital Animations */
-@keyframes float-slow {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-16px) rotate(1deg);
-  }
-}
-
-@keyframes float-reverse {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(12px) rotate(-1deg);
-  }
-}
-
-@keyframes float-gentle {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
-@keyframes pulse-glow {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.75;
-    transform: scale(1.1);
-  }
-}
-
-@keyframes emerald-spark {
-  0%, 100% {
-    opacity: 0.6;
-    filter: drop-shadow(0 0 6px #10b981);
-  }
-  50% {
-    opacity: 1;
-    filter: drop-shadow(0 0 16px #10b981);
-  }
-}
-
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes reverse-spin-slow {
-  from {
-    transform: rotate(360deg);
-  }
-  to {
-    transform: rotate(0deg);
-  }
-}
-
-.animate-float {
-  animation: float-slow 6s ease-in-out infinite;
-}
-
-.animate-float-delayed {
-  animation: float-reverse 7s ease-in-out 1.5s infinite;
-}
-
-.animate-float-gentle {
-  animation: float-gentle 5s ease-in-out 0.8s infinite;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 6s ease-in-out infinite;
-}
-
-.animate-emerald-glow {
-  animation: emerald-spark 3s ease-in-out infinite;
-}
-
-.animate-spin-slow {
-  animation: spin-slow 40s linear infinite;
-}
-
-.animate-reverse-spin-slow {
-  animation: reverse-spin-slow 50s linear infinite;
-}
+:root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color-scheme: dark; --canvas:#090b10; --surface-1:#0d1017; --surface-2:#121620; --surface-3:#171c27; --border:#252b38; --border-strong:#343c4c; --text:#f4f6f8; --text-muted:#929aaa; --text-subtle:#697386; --brand:#7657f6; --brand-hover:#866cf8; --brand-soft:rgba(118,87,246,.12); --success:#32b77c; --success-soft:rgba(50,183,124,.1); --danger:#ef6a79; --radius-sm:6px; --radius-md:8px; --radius-lg:12px; --shadow-overlay:0 20px 60px rgba(0,0,0,.35); }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; min-width:320px; min-height:100vh; overflow-x:hidden; background:var(--canvas); color:var(--text); font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+button,input,select,textarea { font:inherit; }
+button,a { -webkit-tap-highlight-color:transparent; }
+:focus-visible { outline:2px solid #a995ff; outline-offset:3px; }
+::selection { background:rgba(118,87,246,.3); color:white; }
+.app-surface { background:var(--surface-1); border:1px solid var(--border); }
+.app-card { background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-lg); }
+.app-button-primary { background:var(--brand); color:white; border-radius:var(--radius-md); transition:background-color 160ms ease,transform 160ms ease; }
+.app-button-primary:hover { background:var(--brand-hover); }
+.app-button-primary:active { transform:translateY(1px); }
+.app-button-primary:disabled { cursor:not-allowed; opacity:.5; }
+.app-button-secondary { background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:var(--radius-md); transition:background-color 160ms ease,border-color 160ms ease; }
+.app-button-secondary:hover { background:var(--surface-3); border-color:var(--border-strong); }
+.status-success { color:#73d7aa; background:var(--success-soft); border:1px solid rgba(50,183,124,.24); }
+.text-muted { color:var(--text-muted); }
+.font-mono { font-family:"JetBrains Mono","SFMono-Regular",Consolas,monospace; }
+.glass-panel,.glass-card,.glass-beveled { background:var(--surface-1); border:1px solid var(--border); box-shadow:none; backdrop-filter:none; }
+.glass-card-hover { transition:border-color 160ms ease,background-color 160ms ease; }
+.glass-card-hover:hover { transform:none; border-color:var(--border-strong); background:var(--surface-2); box-shadow:none; }
+.glass-glow-purple,.glass-glow-emerald { box-shadow:none; }
+@keyframes fade-in { from { opacity:0; } to { opacity:1; } }
+.animate-fadeIn { animation:fade-in 160ms ease-out both; }
+.animate-float,.animate-float-delayed,.animate-float-gentle,.animate-pulse-glow,.animate-emerald-glow,.animate-spin-slow,.animate-reverse-spin-slow { animation:none !important; }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }

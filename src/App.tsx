@@ -11,7 +11,6 @@ import { WalletConnect } from './components/WalletConnect';
 import { AppDashboard } from './components/AppDashboard';
 import { PaystubModal, PaystubData } from './components/PaystubModal';
 import { Logo } from './components/Logo';
-import { Sparkles, Terminal, ArrowRight, ShieldCheck, Lock, ExternalLink } from 'lucide-react';
 
 export function App() {
   const {
@@ -124,31 +123,6 @@ export function App() {
 
         {/* 2. Main Sections Container */}
         <div className="w-full max-w-6xl mx-auto px-4 space-y-20">
-          {/* Interactive Launch Gateway Banner */}
-          <div className="p-6 sm:p-8 glass-panel rounded-2xl border border-purple-500/30 relative overflow-hidden text-left flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-[11px] font-mono font-semibold text-emerald-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Dedicated Enterprise Workspace</span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                Ready to Execute Zero-Knowledge Transactions?
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
-                Open the full-screen ZK Terminal to access the Dual-State Vault, off-chain Merkle batch roster, and certified paystub certificate generator.
-              </p>
-            </div>
-
-            <button
-              onClick={navigateToApp}
-              className="w-full md:w-auto px-6 py-3.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-indigo-500 hover:from-purple-500 hover:to-indigo-400 text-white rounded-xl font-bold text-xs shadow-xl shadow-purple-600/30 flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Enter ZK Terminal</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
           {/* About Section */}
           <AboutSection />
 
@@ -206,7 +180,7 @@ export function App() {
             <a href="#about" className="hover:text-purple-400 transition-colors">About</a>
             <a href="#how-it-works" className="hover:text-purple-400 transition-colors">How It Works</a>
             <button onClick={navigateToApp} className="hover:text-purple-400 transition-colors cursor-pointer">
-              Terminal
+              Workspace
             </button>
             <a href="#documentation" className="hover:text-purple-400 transition-colors">Documentation</a>
           </div>

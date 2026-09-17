@@ -1,175 +1,21 @@
 import React, { useState } from 'react';
 import { Logo } from './Logo';
 import { WalletState } from '../hooks/useMidnight';
-import { Wallet, ExternalLink, ShieldCheck, LogOut, Menu, X, ArrowRight, Terminal, BookOpen, Layers, Info, Sparkles } from 'lucide-react';
-
-interface NavbarProps {
-  wallet: WalletState;
-  onConnect: () => void;
-  onDisconnect: () => void;
-  onLaunchApp: () => void;
-}
-
-export const Navbar: React.FC<NavbarProps> = ({ wallet, onConnect, onDisconnect, onLaunchApp }) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  return (
-    <header className="sticky top-0 z-50 w-full glass-panel border-b border-purple-500/20 backdrop-blur-2xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Official Brand Logo */}
-          <a href="#hero" className="flex items-center no-underline focus:outline-none">
-            <Logo size={36} showText={true} />
-          </a>
-
-          {/* Center SaaS Navigation Menus (Desktop) */}
-          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
-            <a
-              href="#about"
-              className="px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/60 rounded-lg transition-all duration-200 flex items-center gap-1.5"
-            >
-              <Info className="w-3.5 h-3.5 text-purple-400" />
-              <span>About</span>
-            </a>
-            <a
-              href="#how-it-works"
-              className="px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/60 rounded-lg transition-all duration-200 flex items-center gap-1.5"
-            >
-              <Layers className="w-3.5 h-3.5 text-indigo-400" />
-              <span>How It Works</span>
-            </a>
-            <button
-              onClick={onLaunchApp}
-              className="px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/60 rounded-lg transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
-            >
-              <Terminal className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Terminal</span>
-            </button>
-            <a
-              href="#documentation"
-              className="px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/60 rounded-lg transition-all duration-200 flex items-center gap-1.5"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-purple-400" />
-              <span>Documentation</span>
-            </a>
-          </nav>
-
-          {/* Right Actions: Launch App & Wallet Connection */}
-          <div className="hidden sm:flex items-center gap-3">
-            <a
-              href="https://github.com/brad-git03/Midnight-RiseIn"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1.5 px-3 py-2 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-xl text-xs font-semibold transition-colors"
-            >
-              <span>GitHub</span>
-              <ExternalLink className="w-3 h-3 text-slate-400" />
-            </a>
-
-            {wallet.isConnected ? (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs font-mono text-emerald-300">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <span>{wallet.address?.slice(0, 10)}...</span>
-                </div>
-                <button
-                  onClick={onDisconnect}
-                  className="p-2 bg-slate-900 border border-slate-800 hover:bg-rose-500/10 hover:border-rose-500/30 text-slate-400 hover:text-rose-400 rounded-xl transition-colors cursor-pointer"
-                  title="Disconnect Wallet"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={onConnect}
-                disabled={wallet.isConnecting}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-bold transition-all cursor-pointer"
-              >
-                <Wallet className="w-3.5 h-3.5 text-purple-400" />
-                <span>{wallet.isConnecting ? 'Connecting...' : 'Connect Wallet'}</span>
-              </button>
-            )}
-
-            {/* Launch App Dedicated Button */}
-            <button
-              onClick={onLaunchApp}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 via-indigo-600 to-indigo-500 hover:from-purple-500 hover:to-indigo-400 text-white rounded-xl font-bold text-xs shadow-lg shadow-purple-600/30 transition-all duration-200 active:scale-95 cursor-pointer hover:shadow-purple-600/40"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-purple-200" />
-              <span>Launch App</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-
-          {/* Mobile Menu Toggle Button */}
-          <div className="flex sm:hidden items-center gap-2">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-xl focus:outline-none"
-              aria-label="Toggle Navigation Menu"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
+import { ArrowRight, Menu, X } from 'lucide-react';
+interface NavbarProps { wallet:WalletState; onConnect:()=>void; onDisconnect:()=>void; onLaunchApp:()=>void; }
+export const Navbar:React.FC<NavbarProps> = ({wallet,onConnect,onDisconnect,onLaunchApp}) => {
+  const [open,setOpen]=useState(false);
+  const links=[['Product','#about'],['How it works','#how-it-works'],['Security','#security'],['Docs','#documentation']];
+  return <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[color:var(--canvas)]/95 backdrop-blur-md">
+    <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <a href="#hero" aria-label="Vansidian home"><Logo size={32} showText /></a>
+      <nav className="hidden items-center gap-7 md:flex" aria-label="Primary navigation">{links.map(([label,href])=><a key={href} href={href} className="text-sm text-[var(--text-muted)] transition-colors hover:text-white">{label}</a>)}</nav>
+      <div className="hidden items-center gap-2 sm:flex">
+        <button onClick={wallet.isConnected?onDisconnect:onConnect} disabled={wallet.isConnecting} className="app-button-secondary px-3.5 py-2 text-sm">{wallet.isConnecting?'Connecting…':wallet.isConnected?`${wallet.address?.slice(0,7)}…`:'Connect wallet'}</button>
+        <button onClick={onLaunchApp} className="app-button-primary flex items-center gap-2 px-4 py-2 text-sm font-semibold">Open workspace <ArrowRight className="h-4 w-4" /></button>
       </div>
-
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="sm:hidden border-t border-slate-800/80 bg-slate-950/98 backdrop-blur-2xl px-4 pt-3 pb-5 space-y-3 animate-fadeIn">
-          <nav className="flex flex-col space-y-1">
-            <a
-              href="#about"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2.5 text-sm font-semibold text-slate-200 hover:bg-slate-900 rounded-lg flex items-center gap-2"
-            >
-              <Info className="w-4 h-4 text-purple-400" />
-              <span>About</span>
-            </a>
-            <a
-              href="#how-it-works"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2.5 text-sm font-semibold text-slate-200 hover:bg-slate-900 rounded-lg flex items-center gap-2"
-            >
-              <Layers className="w-4 h-4 text-indigo-400" />
-              <span>How It Works</span>
-            </a>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onLaunchApp();
-              }}
-              className="w-full text-left px-3 py-2.5 text-sm font-semibold text-slate-200 hover:bg-slate-900 rounded-lg flex items-center gap-2 cursor-pointer"
-            >
-              <Terminal className="w-4 h-4 text-emerald-400" />
-              <span>Terminal</span>
-            </button>
-            <a
-              href="#documentation"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2.5 text-sm font-semibold text-slate-200 hover:bg-slate-900 rounded-lg flex items-center gap-2"
-            >
-              <BookOpen className="w-4 h-4 text-purple-400" />
-              <span>Documentation</span>
-            </a>
-          </nav>
-
-          <div className="pt-2 border-t border-slate-800/80 flex flex-col gap-2">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onLaunchApp();
-              }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-indigo-500 text-white rounded-xl font-bold text-sm shadow-lg cursor-pointer"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Launch App Terminal</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
-    </header>
-  );
+      <button onClick={()=>setOpen(!open)} className="app-button-secondary p-2 sm:hidden" aria-expanded={open} aria-label="Toggle navigation">{open?<X className="h-5 w-5"/>:<Menu className="h-5 w-5"/>}</button>
+    </div>
+    {open&&<div className="border-t border-[var(--border)] bg-[var(--surface-1)] p-4 sm:hidden"><nav className="grid gap-1" aria-label="Mobile navigation">{links.map(([label,href])=><a key={href} href={href} onClick={()=>setOpen(false)} className="rounded-lg px-3 py-3 text-sm hover:bg-[var(--surface-2)]">{label}</a>)}<button onClick={onLaunchApp} className="app-button-primary mt-2 px-4 py-3 text-sm font-semibold">Open workspace</button></nav></div>}
+  </header>;
 };
