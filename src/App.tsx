@@ -11,6 +11,7 @@ import { WalletConnect } from './components/WalletConnect';
 import { AppDashboard } from './components/AppDashboard';
 import { PaystubModal, PaystubData } from './components/PaystubModal';
 import { Logo } from './components/Logo';
+import { SystemTransition } from './components/SystemTransition';
 
 export function App() {
   const {
@@ -28,6 +29,7 @@ export function App() {
   const [currentView, setCurrentView] = useState<'landing' | 'app'>('landing');
   const [paystubData, setPaystubData] = useState<PaystubData | null>(null);
   const [isPaystubOpen, setIsPaystubOpen] = useState(false);
+  const [isBooting, setIsBooting] = useState(true);
 
   const isWalletInstalled = checkWalletInstalled();
 
@@ -47,6 +49,10 @@ export function App() {
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
+
+  if (isBooting) {
+    return <SystemTransition mode="splash" onComplete={() => setIsBooting(false)} />;
+  }
 
   const navigateToApp = () => {
     window.location.hash = '#app';
@@ -75,6 +81,7 @@ export function App() {
   if (currentView === 'app') {
     return (
       <>
+        {wallet.isConnecting && <SystemTransition mode="wallet" />}
         <AppDashboard
           wallet={wallet}
           onConnect={connectWallet}
@@ -104,6 +111,7 @@ export function App() {
   // ----------------------------------------------------------------------
   return (
     <div className="min-h-screen bg-[var(--canvas)] text-slate-100 flex flex-col font-sans">
+      {wallet.isConnecting && <SystemTransition mode="wallet" />}
       {/* Sticky Modern SaaS Top Navbar */}
       <Navbar
         wallet={wallet}

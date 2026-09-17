@@ -27,4 +27,12 @@ button,a { -webkit-tap-highlight-color:transparent; }
 .animate-float,.animate-float-delayed,.animate-float-gentle,.animate-pulse-glow,.animate-emerald-glow,.animate-spin-slow,.animate-reverse-spin-slow { animation:none !important; }
 @keyframes shield-drift { 0%,100% { transform:translate3d(0,0,0) rotate(-2deg); } 50% { transform:translate3d(0,-12px,0) rotate(1deg); } }
 .hero-shield-watermark { animation:shield-drift 9s ease-in-out infinite; filter:saturate(.8); }
+@keyframes logo-breathe { 0%,100% { transform:scale(.94); filter:drop-shadow(0 0 8px rgba(118,87,246,.2)); } 50% { transform:scale(1); filter:drop-shadow(0 0 20px rgba(118,87,246,.5)); } }
+@keyframes orbit-turn { to { transform:rotate(360deg); } }
+@keyframes node-pulse { 0%,100% { opacity:.55; } 50% { opacity:1; } }
+@keyframes aura-breathe { 0%,100% { opacity:.5; transform:translate(-50%,-50%) scale(.86); } 50% { opacity:1; transform:translate(-50%,-50%) scale(1.08); } }
+.system-logo-pulse { animation:logo-breathe 1.8s ease-in-out infinite; }
+.system-logo-orbit > div:nth-child(2) { animation:orbit-turn 8s linear infinite; }
+.system-node-pulse { animation:node-pulse .9s ease-in-out infinite; }
+.system-loader-aura { animation:aura-breathe 2.4s ease-in-out infinite; }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
