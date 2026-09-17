@@ -6,6 +6,7 @@ export const HeroSection:React.FC<HeroSectionProps>=({onConnectClick,isConnected
  <div className="relative mx-auto max-w-[1380px] overflow-hidden rounded-b-[30px] border border-white/[.07] bg-[#0c0d14] px-5 pb-8 pt-14 sm:px-10 sm:pt-20 lg:px-14">
   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_72%_22%,rgba(118,87,246,.22),transparent_34%),radial-gradient(circle_at_10%_0%,rgba(50,183,124,.08),transparent_25%)]"/>
   <div className="pointer-events-none absolute inset-0 opacity-[.035] bg-[linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] bg-[size:56px_56px]"/>
+  <img src="/vansidian-logo-v2.png" alt="" aria-hidden="true" className="hero-shield-watermark pointer-events-none absolute -right-[8%] top-[2%] w-[58%] max-w-[780px] opacity-[.075]"/>
   <div className="relative grid items-center gap-14 lg:grid-cols-[.95fr_1.05fr]">
    <div className="max-w-2xl"><div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[.05] px-3 py-1.5 text-xs text-[#c7bcff]"><ShieldCheck className="h-3.5 w-3.5"/>Private finance, publicly verifiable</div>
     <h1 className="text-5xl font-medium leading-[1.02] tracking-[-.055em] text-white sm:text-6xl lg:text-[76px]">Payroll privacy<br/><span className="bg-gradient-to-r from-[#b7a8ff] via-[#8f78ff] to-[#63d6a4] bg-clip-text text-transparent">starts here.</span></h1>

@@ -25,4 +25,6 @@ button,a { -webkit-tap-highlight-color:transparent; }
 @keyframes fade-in { from { opacity:0; } to { opacity:1; } }
 .animate-fadeIn { animation:fade-in 160ms ease-out both; }
 .animate-float,.animate-float-delayed,.animate-float-gentle,.animate-pulse-glow,.animate-emerald-glow,.animate-spin-slow,.animate-reverse-spin-slow { animation:none !important; }
+@keyframes shield-drift { 0%,100% { transform:translate3d(0,0,0) rotate(-2deg); } 50% { transform:translate3d(0,-12px,0) rotate(1deg); } }
+.hero-shield-watermark { animation:shield-drift 9s ease-in-out infinite; filter:saturate(.8); }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }

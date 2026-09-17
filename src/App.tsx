@@ -103,7 +103,7 @@ export function App() {
   // VIEW 2: PUBLIC MARKETING & ARCHITECTURE WEBSITE (SURFACE A)
   // ----------------------------------------------------------------------
   return (
-    <div className="min-h-screen bg-[#04060a] text-slate-100 flex flex-col font-sans selection:bg-purple-500/30 selection:text-purple-200">
+    <div className="min-h-screen bg-[var(--canvas)] text-slate-100 flex flex-col font-sans">
       {/* Sticky Modern SaaS Top Navbar */}
       <Navbar
         wallet={wallet}
@@ -122,12 +122,12 @@ export function App() {
         />
 
         {/* 2. Main Sections Container */}
-        <div className="w-full max-w-6xl mx-auto px-4 space-y-20">
+        <div className="w-full max-w-6xl mx-auto px-5 sm:px-6">
           {/* About Section */}
           <AboutSection />
 
           {/* Guided 4-Step Process & Cryptographic Lifecycle */}
-          <section id="how-it-works" className="pt-6 scroll-mt-20">
+          <section id="how-it-works" className="py-20 scroll-mt-20">
             <WorkflowBar
               isConnected={wallet.isConnected}
               hasWitnessValue={Boolean(privateWitnessValue)}
@@ -170,7 +170,7 @@ export function App() {
       />
 
       {/* Modern SaaS Footer */}
-      <footer className="w-full border-t border-slate-900 bg-slate-950/90 py-12 px-6 mt-28">
+      <footer className="mt-24 w-full border-t border-[var(--border)] bg-[var(--surface-1)] px-6 py-12">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
           <Logo size={34} showText={true} />
           <p className="text-xs text-slate-400">
