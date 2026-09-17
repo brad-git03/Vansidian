@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Vansidian shield">
+  <path d="M32 4.5 55 13v17.2c0 13.4-8.4 23.9-23 29.3C17.4 54.1 9 43.6 9 30.2V13L32 4.5Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m16.5 17 15.6 30L47.5 17h-8.3l-7.1 15.2L24.9 17h-8.4Z" fill="currentColor"/>
+  <circle cx="32" cy="49" r="4.8" fill="none" stroke="currentColor" stroke-width="2.4"/>
+</svg>
