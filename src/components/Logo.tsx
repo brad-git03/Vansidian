@@ -14,7 +14,7 @@ export const Logo: React.FC<LogoProps> = ({ size = 36, showText = true }) => {
         style={{ width: size, height: size }}
       >
         <img
-          src="/vansidian-mark.svg"
+          src="/vansidian-logo-v2.png"
           alt="Vansidian Logo"
           className="w-full h-full object-contain"
           onError={(e) => {
