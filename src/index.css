@@ -31,6 +31,17 @@ button,a { -webkit-tap-highlight-color:transparent; }
 @keyframes orbit-turn { to { transform:rotate(360deg); } }
 @keyframes node-pulse { 0%,100% { opacity:.55; } 50% { opacity:1; } }
 @keyframes aura-breathe { 0%,100% { opacity:.5; transform:translate(-50%,-50%) scale(.86); } 50% { opacity:1; transform:translate(-50%,-50%) scale(1.08); } }
+@keyframes splash-enter { from { opacity:0; } to { opacity:1; } }
+@keyframes splash-reveal { from { opacity:0; transform:translateY(10px) scale(.985); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes stage-fade { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+.system-transition { animation:splash-enter .38s ease-out both; transition:opacity .36s ease,filter .36s ease; }
+.system-transition-exit { opacity:0; filter:blur(5px); pointer-events:none; }
+.system-transition-exit .system-logo-orbit { transform:scale(.94); transition:transform .36s ease; }
+.system-reveal { opacity:0; animation:splash-reveal .55s cubic-bezier(.22,1,.36,1) forwards; }
+.system-reveal-1 { animation-delay:.08s; }
+.system-reveal-2 { animation-delay:.2s; }
+.system-reveal-3 { animation-delay:.34s; }
+.system-stage-label { animation:stage-fade .3s ease-out both; }
 .system-logo-pulse { animation:logo-breathe 1.8s ease-in-out infinite; }
 .system-logo-orbit > div:nth-child(2) { animation:orbit-turn 8s linear infinite; }
 .system-node-pulse { animation:node-pulse .9s ease-in-out infinite; }
