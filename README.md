@@ -18,11 +18,11 @@
 
 | Network  | Contract Address (Hex ID) | Midnight Explorer Link |
 |----------|---------------------------|-------------------------|
-| **Midnight Preview Testnet** | `759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07` | [View on Midnight Explorer](https://preview.midnightexplorer.com/contract/759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07) |
+| **Midnight Preview Testnet** | `0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07` | [View on Midnight Explorer](https://preview.midnightexplorer.com/contracts/0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07) |
 
-* **Live Deployed Contract ID**: `759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07`
+* **Live Deployed Contract ID**: `0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07`
 * **Deployer Wallet Address (Preview)**: `mn_addr_preview1ahxfavzu58myd7mje72crey7nv2vc7hjd57e73zhpndaegwhvs4q2jm5ch`
-* **Direct Explorer Verification**: [https://preview.midnightexplorer.com/contract/759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07](https://preview.midnightexplorer.com/contract/759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07)
+* **Direct Explorer Verification**: [https://preview.midnightexplorer.com/contracts/0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07](https://preview.midnightexplorer.com/contracts/0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07)
 
 *(Contract address is active, verified, and inspectable on Midnight Preview testnet.)*
 

@@ -22,7 +22,7 @@ export interface CircuitCallState {
 // Deployed contract address on Midnight Preview testnet
 export const CONTRACT_HEX_ID = '759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07';
 export const CONTRACT_ADDRESS = CONTRACT_HEX_ID;
-export const CONTRACT_EXPLORER_URL = `https://preview.midnightexplorer.com/contract/${CONTRACT_HEX_ID}`;
+export const CONTRACT_EXPLORER_URL = `https://preview.midnightexplorer.com/contracts/0x${CONTRACT_HEX_ID}`;
 
 // Backward-compatible exports for existing components
 export const PREPROD_CONTRACT_HEX_ID = CONTRACT_HEX_ID;
