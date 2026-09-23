@@ -218,12 +218,23 @@ export const AuditorView: React.FC<AuditorViewProps> = ({
                 <div>
                   <div className="flex items-center gap-2">
                     <code className="text-xs font-mono text-slate-200">{tx.txHash}</code>
-                    <span className="text-[10px] bg-purple-500/10 border border-purple-500/20 text-[#b7a8ff] px-2 py-0.5 rounded">
-                      Verified
-                    </span>
+                    {tx.explorerUrl ? (
+                      <a
+                        href={tx.explorerUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] text-[#b7a8ff] hover:text-white underline cursor-pointer"
+                      >
+                        Explorer <ExternalLink className="w-3 h-3" />
+                      </a>
+                    ) : (
+                      <span className="text-[10px] bg-purple-500/10 border border-purple-500/20 text-[#b7a8ff] px-2 py-0.5 rounded">
+                        Verified
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                    {tx.timestamp} • Disclosed Delta: +{tx.addedValue} State Bound
+                    {tx.timestamp} • {tx.senderRole ? `${tx.senderRole} (${tx.senderAddress ? tx.senderAddress.slice(0, 16) + '...' : ''}) • ` : ''}Disclosed Delta: +{tx.addedValue} State Bound
                   </p>
                 </div>
               </div>

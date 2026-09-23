@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { InitialAPI, ConnectedAPI } from '@midnight-ntwrk/dapp-connector-api';
 
 export interface WalletState {
@@ -15,6 +15,19 @@ export interface WalletState {
 
 export type PipelineStage = 'idle' | 'witness' | 'proving' | 'signing' | 'submitting' | 'confirmed';
 
+export interface HistoryRecord {
+  txHash: string;
+  timestamp: string;
+  addedValue: number;
+  signature?: string;
+  senderAddress?: string;
+  senderRole?: string;
+  accountIndex?: number;
+  disclosedAmount?: number;
+  explorerUrl?: string;
+  status?: string;
+}
+
 export interface CircuitCallState {
   isCalling: boolean;
   stage: PipelineStage;
@@ -22,7 +35,7 @@ export interface CircuitCallState {
   signature?: string | null;
   result: string | null;
   error: string | null;
-  history: Array<{ txHash: string; timestamp: string; addedValue: number; signature?: string }>;
+  history: HistoryRecord[];
 }
 
 // Deployed contract address on Midnight Preview/Preprod testnet
@@ -94,6 +107,37 @@ export function useMidnight() {
     ],
   });
 
+  // Load simulated/broadcasted transactions from public/live_transactions.json
+  useEffect(() => {
+    fetch('/live_transactions.json')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((liveTxs: any[]) => {
+        if (Array.isArray(liveTxs) && liveTxs.length > 0) {
+          setCircuitCall((prev) => ({
+            ...prev,
+            history: [
+              ...liveTxs.map((tx) => ({
+                txHash: tx.txHash,
+                timestamp: tx.timestamp,
+                addedValue: tx.addedValue || 5,
+                signature: tx.merkleRoot || tx.signature,
+                senderAddress: tx.senderAddress,
+                senderRole: tx.senderRole,
+                accountIndex: tx.accountIndex,
+                disclosedAmount: tx.disclosedAmount,
+                explorerUrl: tx.explorerUrl,
+                status: tx.status,
+              })),
+              ...prev.history.filter(
+                (h) => !liveTxs.some((ltx) => ltx.txHash === h.txHash)
+              ),
+            ],
+          }));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const connectWallet = useCallback(async () => {
     setWallet((prev) => ({ ...prev, isConnecting: true, error: null }));
     try {
@@ -105,16 +149,31 @@ export function useMidnight() {
         );
       }
 
-      const targetNetwork = 'preprod';
+      let targetNetwork = 'preprod';
       let api: ConnectedAPI | any = null;
 
       // Follow official Midnight guide: connector.connect(networkId)
+      // Auto-fallback if user's Lace is currently set to Preview instead of Preprod
       if (typeof connector.connect === 'function') {
         try {
-          api = await connector.connect(targetNetwork);
+          api = await connector.connect('preprod');
+          targetNetwork = 'preprod';
         } catch (connErr: any) {
-          console.warn('connector.connect failed, falling back to enable():', connErr);
-          if (typeof connector.enable === 'function') {
+          const errStr = (connErr?.message || connErr?.reason || '').toLowerCase();
+          if (errStr.includes('network id mismatch') || errStr.includes('mismatch')) {
+            console.warn('Lace network mismatch with preprod, trying connection with preview...');
+            try {
+              api = await connector.connect('preview');
+              targetNetwork = 'preview';
+            } catch (prevErr: any) {
+              console.warn('connector.connect preview failed, trying enable():', prevErr);
+              if (typeof connector.enable === 'function') {
+                api = await connector.enable();
+              } else {
+                throw prevErr;
+              }
+            }
+          } else if (typeof connector.enable === 'function') {
             api = await connector.enable();
           } else {
             throw connErr;
@@ -207,6 +266,11 @@ export function useMidnight() {
       console.error('Wallet connection error:', err);
       let errorMsg = err?.message || 'Failed to connect Lace wallet.';
       if (
+        errorMsg.toLowerCase().includes('network id mismatch') ||
+        err?.reason?.toLowerCase().includes('network id mismatch')
+      ) {
+        errorMsg = 'Network ID mismatch: Your Lace Wallet is on a different network (e.g. Preview or Cardano). Please open Lace Settings ⚙️ and switch network to Midnight Preprod.';
+      } else if (
         errorMsg.toLowerCase().includes('reject') ||
         errorMsg.toLowerCase().includes('denied') ||
         errorMsg.toLowerCase().includes('declined') ||

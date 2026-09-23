@@ -13,7 +13,10 @@
     "deploy": "npx tsx src/deploy.ts",
     "test": "npx tsx tests/vansidian.test.ts",
     "network": "npx tsx src/network.ts",
-    "get-address": "npx tsx src/get-address.ts"
+    "get-address": "npx tsx src/get-address.ts",
+    "simulate-tx": "npx tsx scripts/simulate-user-tx.ts",
+    "broadcast-preprod": "npx tsx scripts/broadcast-preprod.ts",
+    "check-balances": "npx tsx scripts/check-balances.ts"
   },
   "dependencies": {
     "@midnight-ntwrk/compact-runtime": "^0.16.0",

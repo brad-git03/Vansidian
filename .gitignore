@@ -22,6 +22,8 @@ midnight-level-db/
 # IDE & OS
 .DS_Store
 Thumbs.db
-.idea/
-.vscode/
 *.log
+
+# Local testing & dev scripts
+scripts/
+
