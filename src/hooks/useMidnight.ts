@@ -19,10 +19,15 @@ export interface CircuitCallState {
   history: Array<{ txHash: string; timestamp: string; addedValue: number }>;
 }
 
-// Preprod contract address (Hex ID and Bech32 representation)
-export const PREPROD_CONTRACT_HEX_ID = '02008f1a4e927c3d2b1f0e9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c';
-export const PREPROD_CONTRACT_BECH32 = 'mn_contract_preprod14g0smfdj6hjjkcd5hjh43xkra9q78zgfluqh7zzz6gy42y24f3jsc8chvm';
-export const PREPROD_CONTRACT_ADDRESS = PREPROD_CONTRACT_BECH32;
+// Deployed contract address on Midnight Preview testnet
+export const CONTRACT_HEX_ID = '759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07';
+export const CONTRACT_ADDRESS = CONTRACT_HEX_ID;
+export const CONTRACT_EXPLORER_URL = `https://preview.midnightexplorer.com/contract/${CONTRACT_HEX_ID}`;
+
+// Backward-compatible exports for existing components
+export const PREPROD_CONTRACT_HEX_ID = CONTRACT_HEX_ID;
+export const PREPROD_CONTRACT_BECH32 = CONTRACT_HEX_ID;
+export const PREPROD_CONTRACT_ADDRESS = CONTRACT_HEX_ID;
 
 export function useMidnight() {
   const [wallet, setWallet] = useState<WalletState>({

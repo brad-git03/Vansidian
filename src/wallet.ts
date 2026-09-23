@@ -123,7 +123,7 @@ export async function createWallet(opts: CreateWalletOptions): Promise<WalletCon
     },
     dust: async (config) => {
       const cls = DustWallet(config);
-      if (saved.dust !== undefined) {
+      if (saved.dust !== undefined && saved.dust.length < 500_000) {
         try {
           const restoredWallet = await (cls as any).restore(saved.dust);
           restored.dust = true;

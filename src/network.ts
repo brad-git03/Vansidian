@@ -64,8 +64,17 @@ export const NETWORK_CONFIGS: Record<NetworkId, NetworkConfig> = {
   },
 };
 
+export function normalizeNetworkId(v: unknown): NetworkId | null {
+  if (typeof v !== 'string') return null;
+  const clean = v.toLowerCase().trim();
+  if (clean === 'preprod' || clean === 'prepod') return 'preprod';
+  if (clean === 'preview') return 'preview';
+  if (clean === 'undeployed' || clean === 'local' || clean === 'devnet') return 'undeployed';
+  return null;
+}
+
 export function isNetworkId(v: unknown): v is NetworkId {
-  return typeof v === 'string' && (NETWORK_IDS as readonly string[]).includes(v);
+  return normalizeNetworkId(v) !== null;
 }
 
 export interface FsOptions {
@@ -102,17 +111,19 @@ export function parseNetworkFlag(argv: string[]): NetworkId | null {
     if (arg === '--network') {
       const v = argv[i + 1];
       if (v === undefined) throw new Error('--network requires a value');
-      if (!isNetworkId(v)) {
+      const normalized = normalizeNetworkId(v);
+      if (!normalized) {
         throw new Error(`Unknown network: ${v}. Supported: ${NETWORK_IDS.join(', ')}.`);
       }
-      return v;
+      return normalized;
     }
     if (arg.startsWith('--network=')) {
       const v = arg.slice('--network='.length);
-      if (!isNetworkId(v)) {
+      const normalized = normalizeNetworkId(v);
+      if (!normalized) {
         throw new Error(`Unknown network: ${v}. Supported: ${NETWORK_IDS.join(', ')}.`);
       }
-      return v;
+      return normalized;
     }
   }
   return null;

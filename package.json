@@ -16,7 +16,7 @@
     "get-address": "npx tsx src/get-address.ts"
   },
   "dependencies": {
-    "@midnight-ntwrk/compact-runtime": "^0.18.0-rc.1",
+    "@midnight-ntwrk/compact-runtime": "^0.16.0",
     "@midnight-ntwrk/dapp-connector-api": "4.0.1",
     "@midnight-ntwrk/midnight-js-contracts": "4.1.1",
     "@midnight-ntwrk/midnight-js-http-client-proof-provider": "4.1.1",
@@ -50,5 +50,8 @@
   },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "optionalDependencies": {
+    "@esbuild/linux-x64": "^0.28.2"
   }
 }

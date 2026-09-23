@@ -16,13 +16,15 @@
 
 ## Contract Address
 
-| Network  | Contract Address (Hex ID) | Bech32 Contract Address |
+| Network  | Contract Address (Hex ID) | Midnight Explorer Link |
 |----------|---------------------------|-------------------------|
-| Preprod  | `02008f1a4e927c3d2b1f0e9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c` | `mn_contract_preprod14g0smfdj6hjjkcd5hjh43xkra9q78zgfluqh7zzz6gy42y24f3jsc8chvm` |
+| **Midnight Preview Testnet** | `759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07` | [View on Midnight Explorer](https://preview.midnightexplorer.com/contract/759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07) |
 
-*Deployer Wallet Address (Preprod)*: `mn_addr_preprod14g0smfdj6hjjkcd5hjh43xkra9q78zgfluqh7zzz6gy42y24f3jsc8chvm`
+* **Live Deployed Contract ID**: `759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07`
+* **Deployer Wallet Address (Preview)**: `mn_addr_preview1ahxfavzu58myd7mje72crey7nv2vc7hjd57e73zhpndaegwhvs4q2jm5ch`
+* **Direct Explorer Verification**: [https://preview.midnightexplorer.com/contract/759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07](https://preview.midnightexplorer.com/contract/759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07)
 
-*(Contract address is MANDATORY and active on Midnight Preprod testnet.)*
+*(Contract address is active, verified, and inspectable on Midnight Preview testnet.)*
 
 ---
 
@@ -53,7 +55,7 @@ Vansidian solves this by utilizing Midnight's dual-state architecture. Sensitive
 
 ## Privacy Claim
 
-> **Privacy Claim Statement**: An on-chain observer analyzing the Midnight Preprod blockchain sees valid transaction hashes, zero-knowledge proofs, and updated public ledger state bounds (`counter`), but **cannot see or deduce** the private witness values (`secretSalaryIncrement`) or client secret parameters used to generate the transaction.
+> **Privacy Claim Statement**: An on-chain observer analyzing the Midnight blockchain (Preview/Preprod) sees valid transaction hashes, zero-knowledge proofs, and updated public ledger state bounds (`counter`), but **cannot see or deduce** the private witness values (`secretSalaryIncrement`) or client secret parameters used to generate the transaction.
 
 ---
 

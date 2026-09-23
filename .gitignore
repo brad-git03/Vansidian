@@ -8,6 +8,8 @@ build/
 # Midnight state & keys
 .midnight-state.json
 .midnight-wallet-state/
+midnight-level-db/
+*-state/
 *.tmp-*
 
 # Environment variables
