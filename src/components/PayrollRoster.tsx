@@ -9,13 +9,34 @@ const INITIAL_EMPLOYEES:Employee[]=[
   {id:'emp-4',name:'Marcus Vance',role:'Smart Contract Auditor',department:'Security',salary:5800,bonus:200},
   {id:'emp-5',name:'Chloe Dupont',role:'Regulatory Compliance Officer',department:'Legal',salary:5100,bonus:100},
 ];
-interface Props { isConnected:boolean; onDisburseBatch:(data:{totalAmount:number;employeeCount:number;batchRootHash:string})=>Promise<void>; isProcessing:boolean; onOpenPaystub:(data:PaystubData)=>void; isPublicMode?:boolean; }
+interface Props { isConnected:boolean; onDisburseBatch:(data:{totalAmount:number;employeeCount:number;batchRootHash:string})=>Promise<{txHash?:string;explorerUrl?:string}|any>; isProcessing:boolean; onOpenPaystub:(data:PaystubData)=>void; isPublicMode?:boolean; }
 export const PayrollRoster:React.FC<Props>=({isConnected,onDisburseBatch,isProcessing,onOpenPaystub,isPublicMode=false})=>{
   const [employees,setEmployees]=useState(INITIAL_EMPLOYEES); const [query,setQuery]=useState(''); const [details,setDetails]=useState(false);
   const shown=useMemo(()=>employees.filter(e=>`${e.name} ${e.role} ${e.department}`.toLowerCase().includes(query.toLowerCase())),[employees,query]);
   const total=employees.reduce((s,e)=>s+e.salary+e.bonus,0); const root='0x'+Array.from({length:8},(_,i)=>((total*31+i*17)%65536).toString(16).padStart(4,'0')).join('')+'f92e4a1b0c3d5e8f';
   const toggle=(id:string)=>setEmployees(v=>v.map(e=>e.id===id?{...e,bonus:e.bonus?0:500}:e));
-  const submit=async()=>{if(!isConnected||isProcessing)return; await onDisburseBatch({totalAmount:total,employeeCount:employees.length,batchRootHash:root}); onOpenPaystub({certificateId:`CERT-${Math.floor(100000+Math.random()*900000)}`,txHash:'0x'+Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join(''),blockTimestamp:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),employeeName:'Vansidian Enterprise Team',employeeRole:'September payroll run',disclosedAmount:total,batchRootHash:root,employeeCount:employees.length,circuitName:'processPayrollBatch (Compact v0.31.1)'});};
+  const submit=async()=>{
+    if(!isConnected||isProcessing)return;
+    try {
+      const res = await onDisburseBatch({totalAmount:total,employeeCount:employees.length,batchRootHash:root});
+      const finalTx = (res && typeof res === 'object' && res.txHash) ? res.txHash : ('0x'+Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join(''));
+      const finalExplorerUrl = (res && typeof res === 'object' && res.explorerUrl) ? res.explorerUrl : (!finalTx.startsWith('0x') ? `https://preprod.midnightexplorer.com/tx/${finalTx}` : undefined);
+      onOpenPaystub({
+        certificateId:`CERT-${Math.floor(100000+Math.random()*900000)}`,
+        txHash:finalTx,
+        explorerUrl:finalExplorerUrl,
+        blockTimestamp:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+        employeeName:'Vansidian Enterprise Team',
+        employeeRole:'September payroll run',
+        disclosedAmount:total,
+        batchRootHash:root,
+        employeeCount:employees.length,
+        circuitName:'processPayrollBatch (Compact v0.31.1)'
+      });
+    } catch (e) {
+      console.error('Payroll disbursement error:', e);
+    }
+  };
   return <section className="app-card overflow-hidden" aria-labelledby="payroll-title">
     <div className="flex flex-col gap-5 border-b border-[var(--border)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"><div><div className="flex items-center gap-2"><h2 id="payroll-title" className="text-lg font-semibold">September payroll</h2><span className="status-success rounded-full px-2 py-0.5 text-xs">Draft</span></div><p className="mt-1 text-sm text-[var(--text-muted)]">Review compensation and submit one private payroll proof.</p></div><button onClick={submit} disabled={!isConnected||isProcessing} className="app-button-primary px-4 py-2.5 text-sm font-semibold">{isProcessing?'Generating proof…':`Submit payroll · $${total.toLocaleString()}`}</button></div>
     <div className="grid grid-cols-2 border-b border-[var(--border)] bg-[var(--canvas)] sm:grid-cols-4">{[['Total payroll',`$${total.toLocaleString()}`],['Team members',String(employees.length)],['Pay date','Sep 30'],['Exceptions','0']].map(([k,v])=><div key={k} className="border-b border-r border-[var(--border)] p-4 sm:border-b-0 sm:p-5"><p className="text-xs text-[var(--text-muted)]">{k}</p><p className="mt-1 text-lg font-semibold">{v}</p></div>)}</div>

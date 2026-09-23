@@ -44,7 +44,7 @@ interface Props {
   onWitnessChange: (v: number) => void;
   publicCounterState: number;
   circuitState: CircuitCallState;
-  onExecute: () => void;
+  onExecute: (options?: any) => Promise<any>;
   onOpenPaystub: (d: PaystubData) => void;
   onBackToWebsite: () => void;
 }
@@ -415,7 +415,7 @@ export const AppDashboard: React.FC<Props> = ({
               {(view === 'overview' || view === 'payroll') && (
                 <PayrollRoster
                   isConnected={wallet.isConnected}
-                  onDisburseBatch={async () => onExecute()}
+                  onDisburseBatch={async (data) => await onExecute(data)}
                   isProcessing={circuitState.isCalling}
                   onOpenPaystub={onOpenPaystub}
                 />

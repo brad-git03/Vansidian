@@ -251,6 +251,7 @@ export const AuditorView: React.FC<AuditorViewProps> = ({
                     onOpenPaystub({
                       certificateId: `AUDIT-${idx + 10482}`,
                       txHash: tx.txHash,
+                      explorerUrl: tx.explorerUrl,
                       blockTimestamp: tx.timestamp,
                       employeeName: 'Auditor Disclosed Verification',
                       disclosedAmount: tx.addedValue * 100,

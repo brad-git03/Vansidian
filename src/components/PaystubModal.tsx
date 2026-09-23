@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Logo } from './Logo';
 import { PREPROD_CONTRACT_ADDRESS } from '../hooks/useMidnight';
-import { X, Printer, Copy, Check, ShieldCheck, QrCode, Lock, CheckCircle2, Calendar, FileText, Hash } from 'lucide-react';
+import { X, Printer, Copy, Check, ShieldCheck, QrCode, Lock, CheckCircle2, Calendar, FileText, Hash, ExternalLink } from 'lucide-react';
 
 export interface PaystubData {
   certificateId: string;
   txHash: string;
+  explorerUrl?: string;
   blockTimestamp: string;
   employeeName?: string;
   employeeRole?: string;
@@ -138,13 +139,26 @@ export const PaystubModal: React.FC<PaystubModalProps> = ({ isOpen, onClose, dat
                 <span className="text-slate-500 block">Verified Transaction Hash:</span>
                 <div className="flex items-center justify-between text-purple-200 mt-0.5">
                   <span className="truncate pr-2">{data.txHash}</span>
-                  <button
-                    onClick={handleCopyHash}
-                    className="text-purple-400 hover:text-purple-300 shrink-0 cursor-pointer flex items-center gap-1"
-                  >
-                    {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                    <span>{copied ? 'Copied' : 'Copy'}</span>
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {data.explorerUrl && (
+                      <a
+                        href={data.explorerUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-purple-400 hover:text-white underline cursor-pointer flex items-center gap-1 text-[11px]"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Explorer</span>
+                      </a>
+                    )}
+                    <button
+                      onClick={handleCopyHash}
+                      className="text-purple-400 hover:text-purple-300 shrink-0 cursor-pointer flex items-center gap-1"
+                    >
+                      {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      <span>{copied ? 'Copied' : 'Copy'}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
