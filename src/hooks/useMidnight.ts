@@ -343,15 +343,21 @@ export function useMidnight() {
         if (api && typeof api.makeTransfer === 'function') {
           setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
 
-          const targetRecipient =
-            options?.recipientAddress ||
-            'mn_addr_preprod14g0smfdj6hjjkcd5hjh43xkra9q78zgfluqh7zzz6gy42y24f3jsc8chvm'; // Verified Preprod Dummy Employee Alpha
+          const isPreview =
+            wallet.network === 'preview' || (wallet.address && wallet.address.startsWith('mn_addr_preview'));
+
+          // Use network-matching recipient (self-address on Preview ensures safety and prevents mismatch)
+          let targetRecipient = wallet.address || 'mn_addr_preprod14g0smfdj6hjjkcd5hjh43xkra9q78zgfluqh7zzz6gy42y24f3jsc8chvm';
+          if (!isPreview && options?.recipientAddress && options.recipientAddress.startsWith('mn_addr_preprod')) {
+            targetRecipient = options.recipientAddress;
+          }
           
           // 10,000 microunits = 0.01 tNIGHT (safe micro-payment)
           const transferAmount = options?.amount || 10_000n;
           const nativeTokenType = '0000000000000000000000000000000000000000000000000000000000000000';
 
           console.log('[Midnight] Initiating live on-chain transaction via Lace makeTransfer...', {
+            network: isPreview ? 'preview' : 'preprod',
             recipient: targetRecipient,
             amount: transferAmount.toString(),
           });
@@ -400,7 +406,8 @@ export function useMidnight() {
             ).join('');
           }
 
-          explorerUrlResult = `https://preprod.midnightexplorer.com/tx/${txHashResult}`;
+          const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
+          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
         } else if (api && typeof api.signData === 'function') {
           // Fallback to cryptographic data signature if makeTransfer is not supported
           setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
@@ -426,7 +433,8 @@ export function useMidnight() {
           txHashResult = Array.from({ length: 64 }, () =>
             Math.floor(Math.random() * 16).toString(16)
           ).join('');
-          explorerUrlResult = `https://preprod.midnightexplorer.com/tx/${txHashResult}`;
+          const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
+          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
         } else {
           // Simulation fallback for demo environments without physical wallet extension
           setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
@@ -440,7 +448,8 @@ export function useMidnight() {
           txHashResult = Array.from({ length: 64 }, () =>
             Math.floor(Math.random() * 16).toString(16)
           ).join('');
-          explorerUrlResult = `https://preprod.midnightexplorer.com/tx/${txHashResult}`;
+          const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
+          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
         }
 
         const addedVal = privateWitnessValue || 1;
