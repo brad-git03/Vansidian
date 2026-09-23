@@ -124,6 +124,7 @@ export const DashboardFrame: React.FC<DashboardFrameProps> = ({
                 stage={circuitState.stage}
                 isCalling={circuitState.isCalling}
                 txHash={circuitState.txHash}
+                signature={circuitState.signature}
               />
               <DualStateDashboard
                 privateWitnessValue={privateWitnessValue}
@@ -144,6 +145,7 @@ export const DashboardFrame: React.FC<DashboardFrameProps> = ({
                 stage={circuitState.stage}
                 isCalling={circuitState.isCalling}
                 txHash={circuitState.txHash}
+                signature={circuitState.signature}
               />
               <PayrollRoster
                 isConnected={isConnected}

@@ -87,6 +87,17 @@ This month, Vansidian has been upgraded with major enterprise usability, visual 
    - Formal audit receipt modal featuring official Obsidian Shield branding, verified transaction hash, Merkle batch root, and Midnight Preprod block height.
    - Includes **"Print / Save as PDF"** for corporate letterhead records and **"Copy Proof Hash"** for third-party verification.
 
+8. **🎭 Multi-Persona Role-Switching Dashboard (`Employer`, `Auditor`, `Employee`)**:
+   - Seamless role switcher in both the workspace top header and responsive sidebar tailored for distinct enterprise stakeholders.
+   - **💼 Employer / Admin (CFO)**: Full compensation roster, private witness input allocation, and 1-click batch Merkle payout via Compact ZK circuit.
+   - **🧾 Auditor / Verifier (`AuditorView`)**: Zero-Knowledge proof and Merkle root inspector, invariant validator, on-chain state audit feed, and formal compliance certificate generator.
+   - **👤 Employee / Recipient (`EmployeePortal`)**: Personal compensation breakdown, cryptographic Merkle leaf inclusion proof verifier, and printable sealed ZK paystub receipt.
+9. **🔗 Native Midnight DApp Connector API v4 & Lace Transaction Signing**:
+   - Upgraded wallet connector adhering strictly to the official Midnight React & Next.js DApp Connector API specification (`window.midnight.mnLace`).
+   - Real-time transaction authorization: triggers official Lace Wallet extension popup to sign transaction commitments (`connectedApi.signData`) with unshielded keys.
+   - Multi-asset resolution: queries unshielded address, shielded address, and live DUST fee balances with copy tools.
+   - Enhanced 4-stage real-time execution pipeline: `1. Local Witness` ➔ `2. ZK Prover` ➔ `3. Lace Sign` ➔ `4. Verification`.
+
 ### 🔮 Coming Later This Month:
 - **🏢 Multi-Tenant Workspace Switcher**: Interactive company selector allowing teams to toggle between isolated organizational state slots (`orgPayrollRoots[orgId]`) directly on the frontend.
 - **📁 Enterprise CSV Batch Uploader**: Drag-and-drop CSV payroll rosters to calculate and disburse batch commitments in a single transaction.
@@ -98,7 +109,10 @@ This month, Vansidian has been upgraded with major enterprise usability, visual 
 See [FEEDBACK.md](FEEDBACK.md) or [docs/FEEDBACK.md](docs/FEEDBACK.md) for full feedback logs and iteration history.
 
 ### Summary of Top Changes Made from User Feedback:
-- **Updated GitHub Actions CI Workflow**: Added multi-job 2-stage verification pipeline (ZK artifact verification + formal test suite + production build + asset validation) with `workflow_dispatch` manual trigger (September 2026).
+- **Added Multi-Persona Role-Switching Workspace**: Integrated dedicated Employer, Auditor, and Employee portals with role toggle in the workspace header (September 2026).
+- **Upgraded Lace Connector to DApp Connector API v4**: Implemented `connector.connect()` handshake, shielded address, DUST balance queries, and live transaction signing via `connectedApi.signData()` (September 2026).
+- **Added 4-Stage Execution Pipeline with Lace Signing**: Visualizes local witness, browser ZK prover, Lace transaction signing, and on-chain confirmation (September 2026).
+- **Updated GitHub Actions CI Workflow**: Multi-job 2-stage verification pipeline with component validation, ZK artifact checking, and production asset testing (September 2026).
 - **Decoupled Dedicated Transaction Workstation**: Separated transactional execution (`#app`) from the public marketing site (`#home`) for distraction-free enterprise operations (September 2026).
 - **Streamlined Card-Free Dashboard Layout**: Replaced heavy nested card clutter with an executive 2-column workstation, hairline dividers, and inline ZK progression tracking (September 2026).
 - **Refined Shield Brand Emblem**: Extracted pure faceted obsidian shield without embedded text clutter for high-resolution icon fidelity (September 2026).
