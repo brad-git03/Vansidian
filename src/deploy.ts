@@ -1,9 +1,9 @@
+import './patch-ws.js';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { resolveNetwork, getOrCreateSeed, recordDeployment } from './network.js';
 import { createWallet, persistWalletState, unshieldedToken, type WalletContext } from './wallet.js';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { WebSocket } from 'ws';
 import * as Rx from 'rxjs';
 
 import { deployContract } from '@midnight-ntwrk/midnight-js-contracts';
@@ -100,7 +100,11 @@ async function main() {
     const elapsed = Math.round((Date.now() - syncStart) / 1000);
     process.stdout.write(`\r  ⏳ Syncing... (${elapsed}s elapsed)   `);
   }, 3000);
-  const state = await walletCtx.wallet.waitForSyncedState();
+  const state = await Rx.firstValueFrom(
+    walletCtx.wallet.state().pipe(
+      Rx.filter((s: any) => s.isSynced === true || s.unshielded?.availableCoins?.length > 0)
+    )
+  );
   clearInterval(syncInterval);
   process.stdout.write('\r  ✓ Synced with network.                                \n\n');
 
@@ -109,42 +113,42 @@ async function main() {
   let balance = state.unshielded.balances[unshieldedToken().raw] ?? 0n;
   console.log(`  Balance: ${balance.toLocaleString()} tNight\n`);
 
-  if (network !== 'undeployed' && networkConfig.faucet) {
-    const initialBalance = await Rx.firstValueFrom(walletCtx.wallet.state().pipe(
-      Rx.filter((s) => s.isSynced),
-    ));
-    const initialTNight = initialBalance.unshielded.balances[unshieldedToken().raw] ?? 0n;
-    if (initialTNight === 0n) {
-      console.log('─── Fund Wallet ────────────────────────────────────────────────\n');
-      console.log(`  Wallet address: ${address}`);
-      console.log(`  Faucet:         ${networkConfig.faucet}`);
-      console.log('');
-      console.log('  Waiting for tNIGHT to arrive (poll every 10s)...');
-      const timeoutMs = 600_000;
-      const start = Date.now();
-      while (true) {
-        await new Promise((r) => setTimeout(r, 10_000));
-        const s = await Rx.firstValueFrom(walletCtx.wallet.state().pipe(Rx.filter((x) => x.isSynced)));
-        const tn = s.unshielded.balances[unshieldedToken().raw] ?? 0n;
-        if (tn > 0n) {
-          console.log(`\n  Funded! tNIGHT balance: ${tn.toLocaleString()}\n`);
-          break;
-        }
-        if (Date.now() - start > timeoutMs) {
-          console.log(`\n  ❌ Funding not received within ${Math.round(timeoutMs / 60_000)} min.`);
-          console.log(`  Address: ${address}`);
-          console.log(`  Faucet:  ${networkConfig.faucet}`);
-          await walletCtx.wallet.stop();
-          process.exit(1);
-        }
-        process.stdout.write(`\r  ...still waiting (${Math.round((Date.now() - start) / 1000)}s elapsed)`);
+  if (balance === 0n && network !== 'undeployed' && networkConfig.faucet) {
+    console.log('─── Fund Wallet ────────────────────────────────────────────────\n');
+    console.log(`  Wallet address: ${address}`);
+    console.log(`  Faucet:         ${networkConfig.faucet}`);
+    console.log('');
+    console.log('  Waiting for tNIGHT to arrive (poll every 10s)...');
+    const timeoutMs = 600_000;
+    const start = Date.now();
+    while (true) {
+      await new Promise((r) => setTimeout(r, 10_000));
+      const s = await Rx.firstValueFrom(walletCtx.wallet.state().pipe(
+        Rx.filter((x: any) => x.isSynced || x.unshielded?.availableCoins?.length > 0)
+      ));
+      const tn = s.unshielded.balances[unshieldedToken().raw] ?? 0n;
+      if (tn > 0n) {
+        console.log(`\n  Funded! tNIGHT balance: ${tn.toLocaleString()}\n`);
+        break;
       }
+      if (Date.now() - start > timeoutMs) {
+        console.log(`\n  ❌ Funding not received within ${Math.round(timeoutMs / 60_000)} min.`);
+        console.log(`  Address: ${address}`);
+        console.log(`  Faucet:  ${networkConfig.faucet}`);
+        await walletCtx.wallet.stop();
+        process.exit(1);
+      }
+      process.stdout.write(`\r  ...still waiting (${Math.round((Date.now() - start) / 1000)}s elapsed)`);
     }
   }
 
   // Register NIGHT UTXOs for DUST generation
   console.log('─── DUST Token Setup ───────────────────────────────────────────\n');
-  const dustState = await Rx.firstValueFrom(walletCtx.wallet.state().pipe(Rx.filter((s) => s.isSynced)));
+  const dustState = await Rx.firstValueFrom(
+    walletCtx.wallet.state().pipe(
+      Rx.filter((s: any) => s.isSynced === true || s.unshielded?.availableCoins?.length > 0)
+    )
+  );
 
   const unregisteredUtxos = dustState.unshielded.availableCoins.filter(
     (c: any) => !c.meta?.registeredForDustGeneration,
@@ -175,8 +179,7 @@ async function main() {
     await Rx.firstValueFrom(
       walletCtx.wallet.state().pipe(
         Rx.throttleTime(5000),
-        Rx.filter((s) => s.isSynced),
-        Rx.filter((s) => s.dust.balance(new Date()) > 0n),
+        Rx.filter((s: any) => s.dust.balance(new Date()) > 0n),
       ),
     );
   }
@@ -211,7 +214,7 @@ async function main() {
   console.log(`  Hex Contract ID:  ${contractAddress}`);
   console.log(`  Deployer Wallet:  ${address.toString()}`);
   const explorerBase = network === 'preview' ? 'https://preview.midnightexplorer.com' : 'https://preprod.midnightexplorer.com';
-  console.log(`  Midnight Explorer: ${explorerBase}/contract/${contractAddress}\n`);
+  console.log(`  Midnight Explorer: ${explorerBase}/contracts/0x${contractAddress}\n`);
 
   recordDeployment(network, contractAddress, address.toString());
   await persistWalletState(network, walletCtx);

@@ -193,6 +193,22 @@ export function useMidnight() {
       let currentNetwork = targetNetwork;
 
       if (api) {
+        // Official DApp Connector API v4: hint usage of methods to request permissions
+        if (typeof api.hintUsage === 'function') {
+          try {
+            await api.hintUsage([
+              'getUnshieldedAddress',
+              'getShieldedAddresses',
+              'getDustBalance',
+              'getConfiguration',
+              'makeTransfer',
+              'submitTransaction',
+            ]);
+          } catch (hintErr) {
+            console.warn('hintUsage note:', hintErr);
+          }
+        }
+
         // Query unshielded address (Bech32m)
         if (typeof api.getUnshieldedAddress === 'function') {
           try {
@@ -200,8 +216,12 @@ export function useMidnight() {
             if (res?.unshieldedAddress) {
               unshieldedAddress = res.unshieldedAddress;
             }
-          } catch (e) {
+          } catch (e: any) {
             console.warn('Failed to retrieve unshielded address from Lace:', e);
+            const errStr = (e?.message || e?.reason || '').toLowerCase();
+            if (errStr.includes('locked')) {
+              throw new Error('Lace wallet is locked. Please click the Lace extension icon in your browser and enter your password to unlock it.');
+            }
           }
         } else if (typeof api.state === 'function') {
           try {
