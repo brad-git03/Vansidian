@@ -217,11 +217,7 @@ export function useMidnight() {
               unshieldedAddress = res.unshieldedAddress;
             }
           } catch (e: any) {
-            console.warn('Failed to retrieve unshielded address from Lace:', e);
-            const errStr = (e?.message || e?.reason || '').toLowerCase();
-            if (errStr.includes('locked')) {
-              throw new Error('Lace wallet is locked. Please click the Lace extension icon in your browser and enter your password to unlock it.');
-            }
+            console.warn('Failed to retrieve unshielded address from Lace (wallet may be in locked background mode):', e);
           }
         } else if (typeof api.state === 'function') {
           try {
