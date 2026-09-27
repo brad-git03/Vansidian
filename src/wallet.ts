@@ -86,6 +86,8 @@ export async function createWallet(opts: CreateWalletOptions): Promise<WalletCon
     indexerClientConnection: {
       indexerHttpUrl: opts.networkConfig.indexer,
       indexerWsUrl: opts.networkConfig.indexerWS,
+      bufferSize: 100000,
+      resumeThreshold: 50000,
     },
     provingServerUrl: new URL(opts.networkConfig.proofServer),
     relayURL: new URL(opts.networkConfig.node.replace(/^http/, 'ws')),
@@ -122,7 +124,14 @@ export async function createWallet(opts: CreateWalletOptions): Promise<WalletCon
       return cls.startWithPublicKey(PublicKey.fromKeyStore(unshieldedKeystore));
     },
     dust: async (config) => {
-      const cls = DustWallet(config);
+      const cls = DustWallet({
+        ...config,
+        batchUpdates: {
+          size: 5000,
+          timeout: 10,
+          spacing: 0,
+        },
+      } as any);
       if (saved.dust !== undefined && saved.dust.length < 500_000) {
         try {
           const restoredWallet = await (cls as any).restore(saved.dust);

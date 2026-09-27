@@ -38,15 +38,15 @@ export interface CircuitCallState {
   history: HistoryRecord[];
 }
 
-// Deployed contract address on Midnight Preview/Preprod testnet
-export const CONTRACT_HEX_ID = '759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07';
-export const CONTRACT_ADDRESS = CONTRACT_HEX_ID;
-export const CONTRACT_EXPLORER_URL = `https://preview.midnightexplorer.com/contracts/0x${CONTRACT_HEX_ID}`;
+// Deployed contract address on Midnight Preprod testnet
+export const CONTRACT_HEX_ID = 'cbd7c6032150647b244c3e8a2483ed22fadaaf72e9c2d98a0af30a543f01b1c2';
+export const CONTRACT_ADDRESS = `0x${CONTRACT_HEX_ID}`;
+export const CONTRACT_EXPLORER_URL = `https://preprod.midnightexplorer.com/contracts/0x${CONTRACT_HEX_ID}`;
 
 // Backward-compatible exports for existing components
 export const PREPROD_CONTRACT_HEX_ID = CONTRACT_HEX_ID;
 export const PREPROD_CONTRACT_BECH32 = CONTRACT_HEX_ID;
-export const PREPROD_CONTRACT_ADDRESS = CONTRACT_HEX_ID;
+export const PREPROD_CONTRACT_ADDRESS = `0x${CONTRACT_HEX_ID}`;
 
 export function useMidnight() {
   const connectedApiRef = useRef<ConnectedAPI | any | null>(null);

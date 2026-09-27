@@ -27,7 +27,7 @@ export const AuditorView: React.FC<AuditorViewProps> = ({
   onOpenPaystub,
 }) => {
   const [searchHash, setSearchHash] = useState(
-    circuitState.history[0]?.txHash || '0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07'
+    circuitState.history[0]?.txHash || PREPROD_CONTRACT_ADDRESS
   );
   const [verifiedHash, setVerifiedHash] = useState(searchHash);
   const [isVerifying, setIsVerifying] = useState(false);

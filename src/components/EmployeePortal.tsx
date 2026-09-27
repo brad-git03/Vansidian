@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PaystubData } from './PaystubModal';
+import { PREPROD_CONTRACT_ADDRESS } from '../hooks/useMidnight';
 import { 
   User, 
   FileText, 
@@ -52,7 +53,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({
   const selected = EMPLOYEES.find((e) => e.id === selectedId) || EMPLOYEES[0];
   const totalPay = selected.salary + selected.bonus;
   const sampleBatchRoot = '0x8849b2c01948ef11029487c889a24410f92e4a1b0c3d5e8f';
-  const sampleTxHash = '0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07';
+  const sampleTxHash = PREPROD_CONTRACT_ADDRESS;
 
   const handleViewPaystub = () => {
     onOpenPaystub({

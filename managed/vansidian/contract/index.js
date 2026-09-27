@@ -82,7 +82,7 @@ export class Contract {
         const newBatchRoot_0 = args_1[2];
         const batchTotalAmount_0 = args_1[3];
         const employeeCount_0 = args_1[4];
-        if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.callContext.currentQueryContext != undefined)) {
+        if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('processPayrollBatch',
                                      'argument 1 (as invoked from Typescript)',
                                      'vansidian.compact line 44 char 1',
@@ -135,7 +135,7 @@ export class Contract {
                                                            employeeCount_0);
         partialProofData.output = { value: [], alignment: [] };
         __compactRuntime.finalizeCallProofData(context, partialProofData);
-        return { result: result_0, context: context, gasCost: context.callContext.currentGasCost };
+        return { result: result_0, context: context, gasCost: context.gasCost };
       },
       increment: async (...args_1) => {
         if (args_1.length !== 2) {
@@ -143,7 +143,7 @@ export class Contract {
         }
         const contextOrig_0 = args_1[0];
         const val_0 = args_1[1];
-        if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.callContext.currentQueryContext != undefined)) {
+        if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('increment',
                                      'argument 1 (as invoked from Typescript)',
                                      'vansidian.compact line 72 char 1',
@@ -172,7 +172,7 @@ export class Contract {
                                                  val_0);
         partialProofData.output = { value: [], alignment: [] };
         __compactRuntime.finalizeCallProofData(context, partialProofData);
-        return { result: result_0, context: context, gasCost: context.callContext.currentGasCost };
+        return { result: result_0, context: context, gasCost: context.gasCost };
       }
     };
     this.impureCircuits = {
@@ -184,7 +184,7 @@ export class Contract {
       increment: this.circuits.increment
     };
   }
-  async initialState(...args_0) {
+  initialState(...args_0) {
     if (args_0.length !== 1) {
       throw new __compactRuntime.CompactError(`Contract state constructor: expected 1 argument (as invoked from Typescript), received ${args_0.length}`);
     }
@@ -210,7 +210,7 @@ export class Contract {
     state_0.data = new __compactRuntime.ChargedState(stateValue_0);
     state_0.setOperation('processPayrollBatch', new __compactRuntime.ContractOperation());
     state_0.setOperation('increment', new __compactRuntime.ContractOperation());
-    const context = __compactRuntime.createCircuitContext('constructor', __compactRuntime.dummyContractAddress(), constructorContext_0.initialZswapLocalState.coinPublicKey, state_0.data, constructorContext_0.initialPrivateState);
+    const context = __compactRuntime.createCircuitContext(__compactRuntime.dummyContractAddress(), constructorContext_0.initialZswapLocalState.coinPublicKey, state_0.data, constructorContext_0.initialPrivateState);
     const partialProofData = {
       input: { value: [], alignment: [] },
       output: undefined,
@@ -258,17 +258,17 @@ export class Contract {
                                                           new __compactRuntime.StateMap()
                                                         ).encode() } },
                                        { ins: { cached: false, n: 1 } }]);
-    state_0.data = new __compactRuntime.ChargedState(context.callContext.currentQueryContext.state.state);
+    state_0.data = new __compactRuntime.ChargedState(context.currentQueryContext.state.state);
     return {
       currentContractState: state_0,
-      currentPrivateState: context.callContext.currentPrivateState,
-      currentZswapLocalState: context.callContext.currentZswapLocalState
+      currentPrivateState: context.currentPrivateState,
+      currentZswapLocalState: context.currentZswapLocalState
     }
   }
   _secretSalaryAmount_0(context, partialProofData) {
-    const witnessContext_0 = __compactRuntime.createWitnessContext(ledger(context.callContext.currentQueryContext.state), context.callContext.currentPrivateState, context.callContext.currentQueryContext.address);
+    const witnessContext_0 = __compactRuntime.createWitnessContext(ledger(context.currentQueryContext.state), context.currentPrivateState, context.currentQueryContext.address);
     const [nextPrivateState_0, result_0] = this.witnesses.secretSalaryAmount(witnessContext_0);
-    context.callContext.currentPrivateState = nextPrivateState_0;
+    context.currentPrivateState = nextPrivateState_0;
     if (!(typeof(result_0) === 'bigint' && result_0 >= 0n && result_0 <= 65535n)) {
       __compactRuntime.typeError('secretSalaryAmount',
                                  'return value',
@@ -283,9 +283,9 @@ export class Contract {
     return result_0;
   }
   _secretBatchHash_0(context, partialProofData) {
-    const witnessContext_0 = __compactRuntime.createWitnessContext(ledger(context.callContext.currentQueryContext.state), context.callContext.currentPrivateState, context.callContext.currentQueryContext.address);
+    const witnessContext_0 = __compactRuntime.createWitnessContext(ledger(context.currentQueryContext.state), context.currentPrivateState, context.currentQueryContext.address);
     const [nextPrivateState_0, result_0] = this.witnesses.secretBatchHash(witnessContext_0);
-    context.callContext.currentPrivateState = nextPrivateState_0;
+    context.currentPrivateState = nextPrivateState_0;
     if (!(result_0.buffer instanceof ArrayBuffer && result_0.BYTES_PER_ELEMENT === 1 && result_0.length === 32)) {
       __compactRuntime.typeError('secretBatchHash',
                                  'return value',
@@ -300,9 +300,9 @@ export class Contract {
     return result_0;
   }
   _secretBatchTotalAmount_0(context, partialProofData) {
-    const witnessContext_0 = __compactRuntime.createWitnessContext(ledger(context.callContext.currentQueryContext.state), context.callContext.currentPrivateState, context.callContext.currentQueryContext.address);
+    const witnessContext_0 = __compactRuntime.createWitnessContext(ledger(context.currentQueryContext.state), context.currentPrivateState, context.currentQueryContext.address);
     const [nextPrivateState_0, result_0] = this.witnesses.secretBatchTotalAmount(witnessContext_0);
-    context.callContext.currentPrivateState = nextPrivateState_0;
+    context.currentPrivateState = nextPrivateState_0;
     if (!(typeof(result_0) === 'bigint' && result_0 >= 0n && result_0 <= 65535n)) {
       __compactRuntime.typeError('secretBatchTotalAmount',
                                  'return value',
@@ -317,9 +317,9 @@ export class Contract {
     return result_0;
   }
   _secretEmployeeCount_0(context, partialProofData) {
-    const witnessContext_0 = __compactRuntime.createWitnessContext(ledger(context.callContext.currentQueryContext.state), context.callContext.currentPrivateState, context.callContext.currentQueryContext.address);
+    const witnessContext_0 = __compactRuntime.createWitnessContext(ledger(context.currentQueryContext.state), context.currentPrivateState, context.currentQueryContext.address);
     const [nextPrivateState_0, result_0] = this.witnesses.secretEmployeeCount(witnessContext_0);
-    context.callContext.currentPrivateState = nextPrivateState_0;
+    context.currentPrivateState = nextPrivateState_0;
     if (!(typeof(result_0) === 'bigint' && result_0 >= 0n && result_0 <= 65535n)) {
       __compactRuntime.typeError('secretEmployeeCount',
                                  'return value',
@@ -438,7 +438,7 @@ export function ledger(stateOrChargedState) {
   const state = stateOrChargedState instanceof __compactRuntime.StateValue ? stateOrChargedState : stateOrChargedState.state;
   const chargedState = stateOrChargedState instanceof __compactRuntime.StateValue ? new __compactRuntime.ChargedState(stateOrChargedState) : stateOrChargedState;
   const context = {
-    callContext: { currentQueryContext: new __compactRuntime.QueryContext(chargedState, __compactRuntime.dummyContractAddress()), currentGasCost: __compactRuntime.emptyRunningCost() },
+    currentQueryContext: new __compactRuntime.QueryContext(chargedState, __compactRuntime.dummyContractAddress()),
     costModel: __compactRuntime.CostModel.initialCostModel()
   };
   const partialProofData = {

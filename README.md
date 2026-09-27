@@ -18,13 +18,14 @@
 
 | Network  | Contract Address (Hex ID) | Midnight Explorer Link |
 |----------|---------------------------|-------------------------|
-| **Midnight Preview Testnet** | `0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07` | [View on Midnight Explorer](https://preview.midnightexplorer.com/contracts/0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07) |
+| **Midnight Preprod Testnet** | `0xcbd7c6032150647b244c3e8a2483ed22fadaaf72e9c2d98a0af30a543f01b1c2` | [View on Midnight Preprod Explorer](https://preprod.midnightexplorer.com/contracts/0xcbd7c6032150647b244c3e8a2483ed22fadaaf72e9c2d98a0af30a543f01b1c2) |
+| **Midnight Preview Testnet** | `0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07` | [View on Midnight Preview Explorer](https://preview.midnightexplorer.com/contracts/0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07) |
 
-* **Live Deployed Contract ID**: `0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07`
-* **Deployer Wallet Address (Preview)**: `mn_addr_preview1ahxfavzu58myd7mje72crey7nv2vc7hjd57e73zhpndaegwhvs4q2jm5ch`
-* **Direct Explorer Verification**: [https://preview.midnightexplorer.com/contracts/0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07](https://preview.midnightexplorer.com/contracts/0x759f78e3c1b0162367a52a6a9437f64c3dee0f531e8cd83fbbb158d87c95fd07)
+* **Live Deployed Contract ID (Preprod)**: `0xcbd7c6032150647b244c3e8a2483ed22fadaaf72e9c2d98a0af30a543f01b1c2`
+* **Deployer Wallet Address (Preprod)**: `mn_addr_preprod14g0smfdj6hjjkcd5hjh43xkra9q78zgfluqh7zzz6gy42y24f3jsc8chvm`
+* **Direct Explorer Verification**: [https://preprod.midnightexplorer.com/contracts/0xcbd7c6032150647b244c3e8a2483ed22fadaaf72e9c2d98a0af30a543f01b1c2](https://preprod.midnightexplorer.com/contracts/0xcbd7c6032150647b244c3e8a2483ed22fadaaf72e9c2d98a0af30a543f01b1c2)
 
-*(Contract address is active, verified, and inspectable on Midnight Preview testnet.)*
+*(Contract address is active, verified on-chain, and inspectable on Midnight Preprod testnet.)*
 
 ---
 

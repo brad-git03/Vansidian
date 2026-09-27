@@ -150,40 +150,40 @@ async function main() {
     )
   );
 
-  const unregisteredUtxos = dustState.unshielded.availableCoins.filter(
-    (c: any) => !c.meta?.registeredForDustGeneration,
-  );
-  if (unregisteredUtxos.length > 0) {
-    console.log(`  Registering ${unregisteredUtxos.length} NIGHT UTXOs for DUST generation...`);
-    const recipe = await walletCtx.wallet.registerNightUtxosForDustGeneration(
-      unregisteredUtxos,
-      walletCtx.unshieldedKeystore.getPublicKey(),
-      (payload) => walletCtx.unshieldedKeystore.signData(payload),
-    );
-    const finalized = await walletCtx.wallet.finalizeRecipe(recipe);
-    for (let i = 1; i <= 6; i++) {
-      try {
-        console.log(`  Submitting DUST registration transaction (attempt ${i}/6)...`);
-        await walletCtx.wallet.submitTransaction(finalized);
-        console.log('  Submitted DUST registration transaction successfully.');
-        break;
-      } catch (err: any) {
-        console.log(`  Submission attempt ${i} note: ${err?.message || err}. Retrying in 4s...`);
-        await new Promise((r) => setTimeout(r, 4000));
-      }
-    }
-  }
+  let currentDust = dustState.dust.balance(new Date());
+  console.log(`  Initial DUST balance: ${currentDust.toString()}`);
 
-  if (dustState.dust.balance(new Date()) === 0n) {
-    console.log('  Waiting for DUST tokens to accrue...');
-    await Rx.firstValueFrom(
+  if (currentDust === 0n) {
+    console.log('  Waiting for DUST tokens to accrue from designated registration...');
+    let latestState = dustState;
+    const trackerSub = walletCtx.wallet.state().subscribe((s: any) => {
+      latestState = s;
+    });
+    const waitStart = Date.now();
+    let lastSaved = 0;
+    const waitInterval = setInterval(async () => {
+      const elapsed = Math.round((Date.now() - waitStart) / 1000);
+      const applied = latestState?.dust?.progress?.appliedIndex ?? 0n;
+      const target = latestState?.dust?.progress?.highestRelevantWalletIndex ?? 0n;
+      const pct = target > 0n ? ((Number(applied) / Number(target)) * 100).toFixed(1) : '0';
+      process.stdout.write(`\r  ⏳ Syncing DUST: ${pct}% (${applied}/${target}) - (${elapsed}s elapsed)   `);
+      if (Date.now() - lastSaved > 15_000 && applied > 0n) {
+        lastSaved = Date.now();
+        await persistWalletState(network, walletCtx).catch(() => {});
+      }
+    }, 2000);
+    const accrued = await Rx.firstValueFrom(
       walletCtx.wallet.state().pipe(
-        Rx.throttleTime(5000),
         Rx.filter((s: any) => s.dust.balance(new Date()) > 0n),
       ),
     );
+    clearInterval(waitInterval);
+    trackerSub.unsubscribe();
+    await persistWalletState(network, walletCtx).catch(() => {});
+    process.stdout.write('\n');
+    currentDust = accrued.dust.balance(new Date());
   }
-  console.log('  DUST tokens ready!\n');
+  console.log(`  DUST tokens ready! Available gas: ${currentDust.toString()}\n`);
 
   console.log('─── Deploy Contract ────────────────────────────────────────────\n');
   const providers = await createProviders(walletCtx);
@@ -201,7 +201,8 @@ async function main() {
       break;
     } catch (err: any) {
       const msg = err?.message || err?.toString() || '';
-      console.log(`  Attempt ${attempt} note: ${msg}. Retrying in 6s...`);
+      const cause = err?.cause ? ` (Cause: ${err.cause.message || err.cause})` : '';
+      console.log(`  Attempt ${attempt} note: ${msg}${cause}. Retrying in 6s...`);
       await new Promise((r) => setTimeout(r, 6000));
     }
   }
