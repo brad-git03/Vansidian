@@ -9,7 +9,7 @@
 ## Live Demo & Social Links
 
 - 🔗 **Live Application URL**: [https://vansidian-protocol.vercel.app](https://vansidian-protocol.vercel.app)
-- 🐦 **Official X (Twitter) Platform**: [https://x.com/vansidian](https://x.com/vansidian)
+- 🐦 **Official X (Twitter) Platform**: [https://x.com/vansidianmain](https://x.com/vansidianmain)
 - 📂 **GitHub Repository**: [https://github.com/brad-git03/Midnight-RiseIn](https://github.com/brad-git03/Midnight-RiseIn)
 
 ---
@@ -148,7 +148,7 @@ See [FEEDBACK.md](FEEDBACK.md) or [docs/FEEDBACK.md](docs/FEEDBACK.md) for full 
 - **Brand Brief**: See [docs/BRAND_BRIEF.md](docs/BRAND_BRIEF.md) for taglines, differentiators, and color palette tokens.
 - **High-Res Logo (PNG)**: [`public/logo.png`](public/logo.png) | [`docs/vansidian_logo.png`](docs/vansidian_logo.png)
 - **Vector Favicon (SVG)**: [`public/shield.svg`](public/shield.svg)
-- **Official X Profile**: [https://x.com/vansidian](https://x.com/vansidian)
+- **Official X Profile**: [https://x.com/vansidianmain](https://x.com/vansidianmain)
 
 ---
 

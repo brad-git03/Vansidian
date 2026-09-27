@@ -101,7 +101,16 @@ export circuit processPayrollBatch(
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <a
+                href="https://x.com/vansidianmain"
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
+              >
+                <span>X (Twitter)</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
               <a
                 href="https://github.com/brad-git03/Midnight-RiseIn"
                 target="_blank"

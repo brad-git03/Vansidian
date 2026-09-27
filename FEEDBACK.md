@@ -40,7 +40,7 @@ User feedback was collected across three primary channels during the Level 5 & L
 | **Dual Contract Address Formatting** | Reviewer/evaluator required distinct Hex Contract ID (`0200...`) and Bech32 Contract Address (`mn_contract_preprod...`) to prevent wallet address confusion. | ✅ Completed (`9f221c5`) |
 | **Direct Copy Contract Address Action** | Testers requested one-click clipboard copying for the verified Preprod contract address. | ✅ Completed (`a53bf54`) |
 | **Root & Docs Mirrored Artifacts** | Evaluator requested all evidence artifacts (`USERS.md`, `FEEDBACK.md`, `USAGE.md`, `COMMITS.md`) to be available directly in root for automated parsing. | ✅ Completed (`a58c0a7`) |
-| **Official X (Twitter) Platform Integration** | Added direct access to official `@vansidian` X profile across DApp navbar, header, and README. | ✅ Completed (`3e2dcf7`) |
+| **Official X (Twitter) Platform Integration** | Added direct access to official `@vansidianmain` X profile across DApp navbar, header, and README. | ✅ Completed (`3e2dcf7`) |
 | **Level 6 Launch Users Directory** | Onboarded 20 verified Preprod testnet users in `LAUNCH_USERS.md`. | ✅ Completed |
 | **Brand Brief & Onboarding Kit** | Created `docs/BRAND_BRIEF.md` and `docs/ONBOARDING.md` for seamless user acquisition. | ✅ Completed |
 

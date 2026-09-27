@@ -192,6 +192,9 @@ export function App() {
               Workspace
             </button>
             <a href="#documentation" className="hover:text-purple-400 transition-colors">Documentation</a>
+            <a href="https://x.com/vansidianmain" target="_blank" rel="noreferrer" className="hover:text-purple-400 transition-colors">
+              X (Twitter)
+            </a>
           </div>
         </div>
       </footer>
