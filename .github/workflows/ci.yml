@@ -59,12 +59,21 @@ jobs:
       - name: Install Dependencies
         run: npm ci || npm install
 
-      - name: Verify Multi-Persona & Connector Components
+      - name: Verify Multi-Persona & Midnight DApp Connector Components
         run: |
           test -f src/components/AuditorView.tsx || { echo "Missing AuditorView component"; exit 1; }
           test -f src/components/EmployeePortal.tsx || { echo "Missing EmployeePortal component"; exit 1; }
+          test -f src/components/WalletConnect.tsx || { echo "Missing WalletConnect component"; exit 1; }
+          test -f src/components/HeroSection.tsx || { echo "Missing HeroSection component"; exit 1; }
           test -f src/hooks/useMidnight.ts || { echo "Missing useMidnight hook"; exit 1; }
           echo "All role-switching and Midnight DApp connector components verified."
+
+      - name: Verify DApp Connector Concurrency & Error Safeguards
+        run: |
+          grep -q "isConnectingRef" src/hooks/useMidnight.ts || { echo "Missing isConnectingRef concurrency lock in useMidnight.ts"; exit 1; }
+          grep -q "RemoteApiShutdownError" src/hooks/useMidnight.ts || { echo "Missing RemoteApiShutdownError handling in useMidnight.ts"; exit 1; }
+          grep -q "isConnecting" src/components/HeroSection.tsx || { echo "Missing isConnecting guard in HeroSection.tsx"; exit 1; }
+          echo "Midnight DApp Connector concurrency locks and shutdown error safeguards verified."
 
       - name: Build Vite Production Bundle
         run: npm run build
@@ -73,5 +82,7 @@ jobs:
         run: |
           test -f dist/index.html || { echo "Missing index.html"; exit 1; }
           test -f dist/logo.png || { echo "Missing logo.png asset"; exit 1; }
+          test -f dist/vansidian-logo-v2.png || { echo "Missing vansidian-logo-v2.png asset"; exit 1; }
+          test -f dist/live_transactions.json || { echo "Missing live_transactions.json asset"; exit 1; }
           test -d dist/assets || { echo "Missing dist/assets directory"; exit 1; }
           echo "Production frontend build, role-switching dashboard, and core brand assets completed with 0 errors."
