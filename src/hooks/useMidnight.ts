@@ -128,7 +128,7 @@ export function useMidnight() {
     return () => clearInterval(interval);
   }, [refreshLedger]);
 
-  // Load simulated/broadcasted transactions from public/live_transactions.json
+  // Load confirmed on-chain transactions from public/live_transactions.json
   useEffect(() => {
     fetch('/live_transactions.json')
       .then((res) => (res.ok ? res.json() : []))
