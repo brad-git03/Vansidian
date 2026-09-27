@@ -41,22 +41,27 @@ Vansidian solves this by utilizing Midnight's dual-state architecture. Sensitive
 
 ## Privacy Model
 
-- **What is PUBLIC (on-chain, anyone can see)**:
-  - `counter`: The public ledger state storing verified state values on the Midnight blockchain.
-  - Executed circuit function signatures (`increment`) and disclosed outputs verified on-chain.
+- **What is PUBLIC (on-chain, consensus-visible)**:
+  - `counter`: Cumulative verified public ledger counter on Midnight Preprod blockchain.
+  - `totalBatchesProcessed`: Cumulative count of payroll batches processed across all tenants.
+  - `totalVolumeDisbursed`: Cumulative gross disbursement volume verified on-chain.
+  - `orgPayrollRoots`: 32-byte cryptographic Merkle batch root commitments mapped by organization ID (`orgId`).
+  - Transaction proofs (`ZK-SNARKs`) and verified circuit execution confirmations.
 
-- **What is PRIVATE (private witness, never on-chain)**:
-  - `secretSalaryIncrement`: Private witness function executing strictly inside local browser memory.
-  - Raw secret witness values, employee compensation parameters, contractor rates, and client private keys.
+- **What is PRIVATE (zero-knowledge witness, strictly local browser RAM)**:
+  - `secretSalaryAmount`: Individual employee salary and bonus payouts.
+  - `secretBatchHash`: Preimage Merkle tree leaves containing specific employee payroll allocations.
+  - `secretBatchTotalAmount` & `secretEmployeeCount`: Private witness verification context.
+  - Private spending keys, individual compensation tiers, and contractor rates.
 
 - **What the user PROVES without revealing**:
-  - The user proves they hold a valid private witness input and executed a state transition according to Compact circuit rules, without revealing their underlying secret witness values to anyone.
+  - The employer proves that their batch disbursement satisfies all Compact circuit invariants (positive amounts, valid batch sizes `<= 1000`, and exact Merkle root binding) **without disclosing any individual employee's salary or identity** to external observers or the blockchain.
 
 ---
 
 ## Privacy Claim
 
-> **Privacy Claim Statement**: An on-chain observer analyzing the Midnight blockchain (Preview/Preprod) sees valid transaction hashes, zero-knowledge proofs, and updated public ledger state bounds (`counter`), but **cannot see or deduce** the private witness values (`secretSalaryIncrement`) or client secret parameters used to generate the transaction.
+> **Privacy Claim Statement**: An on-chain observer or block explorer analyzing the Midnight Preprod blockchain sees valid transaction hashes, zero-knowledge proofs, organization Merkle batch roots, and cumulative volume metrics, but **cannot see, extract, or deduce** any individual employee's salary amount, contractor rate, or private witness parameters used in the transaction.
 
 ---
 
