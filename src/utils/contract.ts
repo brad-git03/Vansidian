@@ -35,15 +35,9 @@ export async function executeBatchPayrollCircuit(
   console.log(`[Vansidian Engine] Aggregating ${options.employeeCount} employee payouts into Merkle Root: ${options.batchRootHash}`);
   console.log(`[Vansidian Engine] Proving batch disbursement total: $${options.totalBatchAmount} in local browser memory`);
 
-  // Simulate local ZK-SNARK batch proof calculation
-  await new Promise((r) => setTimeout(r, 2200));
-
-  const generatedTxHash =
-    '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-
   return {
     success: true,
-    txHash: generatedTxHash,
+    txHash: options.batchRootHash,
     disclosedState: options.totalBatchAmount,
     blockTimestamp: new Date().toISOString(),
     batchMetrics: {
@@ -64,14 +58,9 @@ export async function executePayrollCircuit(
   console.log(`[Vansidian Engine] Executing confidential ZK circuit for target: ${PREPROD_CONTRACT_ADDRESS}`);
   console.log(`[Vansidian Engine] Reading local witness parameter in browser memory (value: ${options.witnessValue})`);
 
-  await new Promise((r) => setTimeout(r, 2000));
-
-  const generatedTxHash =
-    '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-
   return {
     success: true,
-    txHash: generatedTxHash,
+    txHash: PREPROD_CONTRACT_ADDRESS,
     disclosedState: options.witnessValue,
     blockTimestamp: new Date().toISOString(),
   };

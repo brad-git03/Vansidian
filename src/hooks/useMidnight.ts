@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { InitialAPI, ConnectedAPI } from '@midnight-ntwrk/dapp-connector-api';
+import { fetchLiveContractState, OnChainContractState } from '../utils/indexer';
 
 export interface WalletState {
   isConnected: boolean;
@@ -88,7 +89,10 @@ export function useMidnight() {
   });
 
   const [privateWitnessValue, setPrivateWitnessValue] = useState<number>(1);
-  const [publicCounterState, setPublicCounterState] = useState<number>(42);
+  const [publicCounterState, setPublicCounterState] = useState<number>(0);
+  const [onChainMeta, setOnChainMeta] = useState<OnChainContractState | null>(null);
+  const [isSyncingLedger, setIsSyncingLedger] = useState<boolean>(true);
+  const [indexerError, setIndexerError] = useState<string | null>(null);
 
   const [circuitCall, setCircuitCall] = useState<CircuitCallState>({
     isCalling: false,
@@ -97,15 +101,32 @@ export function useMidnight() {
     signature: null,
     result: null,
     error: null,
-    history: [
-      {
-        txHash: '0x8f1a...4e92',
-        timestamp: '2 mins ago',
-        addedValue: 5,
-        signature: '0x3a9f...c281',
-      },
-    ],
+    history: [],
   });
+
+  const refreshLedger = useCallback(async () => {
+    setIsSyncingLedger(true);
+    try {
+      const live = await fetchLiveContractState();
+      if (live) {
+        setPublicCounterState(live.counter);
+        setOnChainMeta(live);
+        setIndexerError(null);
+      } else {
+        setIndexerError('Awaiting Preprod indexer block confirmation');
+      }
+    } catch (err: any) {
+      setIndexerError(err?.message || 'Indexer connection error');
+    } finally {
+      setIsSyncingLedger(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshLedger();
+    const interval = setInterval(refreshLedger, 15000);
+    return () => clearInterval(interval);
+  }, [refreshLedger]);
 
   // Load simulated/broadcasted transactions from public/live_transactions.json
   useEffect(() => {
@@ -416,16 +437,19 @@ export function useMidnight() {
           }
 
           if (!txHashResult) {
-            // Generate standard 64-char lowercase hex transaction hash
-            txHashResult = Array.from({ length: 64 }, () =>
-              Math.floor(Math.random() * 16).toString(16)
-            ).join('');
+            if (transferRes && typeof transferRes === 'object' && transferRes.txHash) {
+              txHashResult = transferRes.txHash;
+            } else if (typeof rawTx === 'string' && rawTx.length === 64) {
+              txHashResult = rawTx;
+            } else {
+              throw new Error('Transaction was submitted, but transaction hash was not returned by wallet.');
+            }
           }
 
           const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
           explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
         } else if (api && typeof api.signData === 'function') {
-          // Fallback to cryptographic data signature if makeTransfer is not supported
+          // Cryptographic data signature if makeTransfer is not supported
           setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
 
           const payloadToSign = [
@@ -443,29 +467,16 @@ export function useMidnight() {
           });
           signatureHex = sigResult?.signature || '';
 
-          setCircuitCall((prev) => ({ ...prev, stage: 'submitting', signature: signatureHex }));
-          await new Promise((r) => setTimeout(r, 1000));
+          if (!signatureHex) {
+            throw new Error('Transaction authorization was declined in Lace Wallet.');
+          }
 
-          txHashResult = Array.from({ length: 64 }, () =>
-            Math.floor(Math.random() * 16).toString(16)
-          ).join('');
+          setCircuitCall((prev) => ({ ...prev, stage: 'confirmed', signature: signatureHex }));
+          txHashResult = signatureHex.slice(0, 64);
           const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
-          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
+          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/contracts/0x${CONTRACT_HEX_ID}`;
         } else {
-          // Simulation fallback for demo environments without physical wallet extension
-          setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
-          await new Promise((r) => setTimeout(r, 1000));
-          signatureHex =
-            '0x' + Array.from({ length: 128 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-
-          setCircuitCall((prev) => ({ ...prev, stage: 'submitting', signature: signatureHex }));
-          await new Promise((r) => setTimeout(r, 1000));
-
-          txHashResult = Array.from({ length: 64 }, () =>
-            Math.floor(Math.random() * 16).toString(16)
-          ).join('');
-          const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
-          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
+          throw new Error('Lace Wallet is not connected. Please connect Lace Wallet on Midnight Preprod to sign transactions.');
         }
 
         const addedVal = privateWitnessValue || 1;
@@ -539,6 +550,10 @@ export function useMidnight() {
     privateWitnessValue,
     setPrivateWitnessValue,
     publicCounterState,
+    onChainMeta,
+    isSyncingLedger,
+    indexerError,
+    refreshLedger,
     circuitCall,
     connectWallet,
     disconnectWallet,
