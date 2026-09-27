@@ -1,8 +1,8 @@
 import React from 'react';
 import { ArrowRight, Check, Fingerprint, LockKeyhole, ShieldCheck, Users } from 'lucide-react';
-interface HeroSectionProps { onConnectClick:()=>void; isConnected:boolean; onLaunchApp:()=>void; }
+interface HeroSectionProps { onConnectClick:()=>void; isConnected:boolean; isConnecting?:boolean; onLaunchApp:()=>void; }
 const people=[['SJ','Sarah Jenkins'],['DK','David Kim'],['ER','Elena Rostova'],['MV','Marcus Vance']];
-export const HeroSection:React.FC<HeroSectionProps>=({onConnectClick,isConnected,onLaunchApp})=><section id="hero" className="w-full px-3 pb-16 sm:px-5">
+export const HeroSection:React.FC<HeroSectionProps>=({onConnectClick,isConnected,isConnecting,onLaunchApp})=><section id="hero" className="w-full px-3 pb-16 sm:px-5">
  <div className="relative mx-auto max-w-[1380px] overflow-hidden rounded-b-[30px] border border-white/[.07] bg-[#0c0d14] px-5 pb-8 pt-14 sm:px-10 sm:pt-20 lg:px-14">
   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_72%_22%,rgba(118,87,246,.22),transparent_34%),radial-gradient(circle_at_10%_0%,rgba(50,183,124,.08),transparent_25%)]"/>
   <div className="pointer-events-none absolute inset-0 opacity-[.035] bg-[linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] bg-[size:56px_56px]"/>
@@ -12,7 +12,7 @@ export const HeroSection:React.FC<HeroSectionProps>=({onConnectClick,isConnected
     <h1 className="text-5xl font-medium leading-[1.02] tracking-[-.055em] text-white sm:text-6xl lg:text-[76px]">Payroll privacy<br/><span className="bg-gradient-to-r from-[#b7a8ff] via-[#8f78ff] to-[#63d6a4] bg-clip-text text-transparent">starts here.</span></h1>
     <p className="mt-6 max-w-lg text-sm leading-6 text-[var(--text-muted)] sm:text-base">Run confidential payroll, prove every disbursement, and give auditors exactly what they need—without exposing employee compensation.</p>
     <div className="mt-8 flex flex-col gap-3 sm:flex-row"><button onClick={onLaunchApp} className="app-button-primary flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold">Start a payroll run <ArrowRight className="h-4 w-4"/></button><a href="#how-it-works" className="app-button-secondary flex items-center justify-center rounded-full px-6 py-3 font-semibold">See how it works</a></div>
-    {!isConnected&&<button onClick={onConnectClick} className="mt-4 text-xs text-[var(--text-muted)] hover:text-white">Connect a Lace wallet instead →</button>}
+    {!isConnected&&<button onClick={onConnectClick} disabled={isConnecting} className="mt-4 text-xs text-[var(--text-muted)] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">{isConnecting ? 'Waiting for Lace authorization…' : 'Connect a Lace wallet instead →'}</button>}
    </div>
    <div className="relative mx-auto w-full max-w-[620px] pb-10" aria-label="Vansidian workspace preview">
     <div className="absolute -inset-8 rounded-full bg-[#7657f6]/10 blur-3xl"/>

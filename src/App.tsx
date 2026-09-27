@@ -126,6 +126,7 @@ export function App() {
         <HeroSection
           onConnectClick={connectWallet}
           isConnected={wallet.isConnected}
+          isConnecting={wallet.isConnecting}
           onLaunchApp={navigateToApp}
         />
 

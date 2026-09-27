@@ -51,6 +51,7 @@ export const PREPROD_CONTRACT_ADDRESS = `0x${CONTRACT_HEX_ID}`;
 
 export function useMidnight() {
   const connectedApiRef = useRef<ConnectedAPI | any | null>(null);
+  const isConnectingRef = useRef<boolean>(false);
 
   const getLaceConnector = useCallback((): InitialAPI | any | null => {
     if (typeof window === 'undefined') return null;
@@ -160,6 +161,12 @@ export function useMidnight() {
   }, []);
 
   const connectWallet = useCallback(async () => {
+    // Prevent duplicate concurrent connection calls
+    if (isConnectingRef.current) {
+      console.warn('Wallet connection already in progress, ignoring duplicate call.');
+      return;
+    }
+    isConnectingRef.current = true;
     setWallet((prev) => ({ ...prev, isConnecting: true, error: null }));
     try {
       const connector = getLaceConnector();
@@ -234,7 +241,9 @@ export function useMidnight() {
         if (typeof api.getUnshieldedAddress === 'function') {
           try {
             const res = await api.getUnshieldedAddress();
-            if (res?.unshieldedAddress) {
+            if (typeof res === 'string' && res) {
+              unshieldedAddress = res;
+            } else if (res?.unshieldedAddress) {
               unshieldedAddress = res.unshieldedAddress;
             }
           } catch (e: any) {
@@ -255,7 +264,9 @@ export function useMidnight() {
         if (typeof api.getShieldedAddresses === 'function') {
           try {
             const res = await api.getShieldedAddresses();
-            if (res?.shieldedAddress) {
+            if (Array.isArray(res?.shieldedAddresses) && res.shieldedAddresses.length > 0) {
+              shieldedAddress = res.shieldedAddresses[0];
+            } else if (res?.shieldedAddress) {
               shieldedAddress = res.shieldedAddress;
             }
           } catch (e) {
@@ -303,6 +314,12 @@ export function useMidnight() {
       console.error('Wallet connection error:', err);
       let errorMsg = err?.message || 'Failed to connect Lace wallet.';
       if (
+        err?.name === 'RemoteApiShutdownError' ||
+        errorMsg.toLowerCase().includes('midnight-authenticator') ||
+        errorMsg.toLowerCase().includes('shutdown')
+      ) {
+        errorMsg = 'Connection authorization window was closed or interrupted. Please click Connect and approve the request in your Lace Wallet popup.';
+      } else if (
         errorMsg.toLowerCase().includes('network id mismatch') ||
         err?.reason?.toLowerCase().includes('network id mismatch')
       ) {
@@ -313,7 +330,7 @@ export function useMidnight() {
         errorMsg.toLowerCase().includes('declined') ||
         errorMsg.toLowerCase().includes('cancel')
       ) {
-        errorMsg = 'Connection request rejected by user in Lace Wallet.';
+        errorMsg = 'Connection request was cancelled or declined in Lace Wallet.';
       }
       setWallet((prev) => ({
         ...prev,
@@ -321,6 +338,8 @@ export function useMidnight() {
         isConnecting: false,
         error: errorMsg,
       }));
+    } finally {
+      isConnectingRef.current = false;
     }
   }, [getLaceConnector]);
 
