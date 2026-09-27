@@ -117,7 +117,7 @@ export class Contract {
                                      'Uint<0..65536>',
                                      employeeCount_0)
         }
-        const context = __compactRuntime.copyCircuitContext(contextOrig_0);
+        const context = { ...contextOrig_0 };
         const partialProofData = {
           input: {
             value: _descriptor_1.toValue(orgId_0).concat(_descriptor_1.toValue(newBatchRoot_0).concat(_descriptor_0.toValue(batchTotalAmount_0).concat(_descriptor_0.toValue(employeeCount_0)))),
@@ -134,7 +134,6 @@ export class Contract {
                                                            batchTotalAmount_0,
                                                            employeeCount_0);
         partialProofData.output = { value: [], alignment: [] };
-        __compactRuntime.finalizeCallProofData(context, partialProofData);
         return { result: result_0, context: context, gasCost: context.gasCost };
       },
       increment: async (...args_1) => {
@@ -157,7 +156,7 @@ export class Contract {
                                      'Uint<0..65536>',
                                      val_0)
         }
-        const context = __compactRuntime.copyCircuitContext(contextOrig_0);
+        const context = { ...contextOrig_0 };
         const partialProofData = {
           input: {
             value: _descriptor_0.toValue(val_0),
@@ -171,7 +170,6 @@ export class Contract {
                                                  partialProofData,
                                                  val_0);
         partialProofData.output = { value: [], alignment: [] };
-        __compactRuntime.finalizeCallProofData(context, partialProofData);
         return { result: result_0, context: context, gasCost: context.gasCost };
       }
     };

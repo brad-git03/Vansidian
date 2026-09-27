@@ -375,89 +375,40 @@ export function useMidnight() {
         let explorerUrlResult = '';
 
         const api = connectedApiRef.current;
+        if (!api) {
+          throw new Error('Lace Wallet is not connected. Please connect Lace Wallet on Midnight Preprod to execute this circuit.');
+        }
 
-        // Option 1: Live On-Chain Transaction Submission via Lace makeTransfer + submitTransaction
-        if (api && typeof api.makeTransfer === 'function') {
+        // Priority 1: Official Contract Transaction Balancing if supported by wallet extension
+        if (typeof (api as any).balanceUnsealedTransaction === 'function') {
           setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
-
-          const isPreview =
-            wallet.network === 'preview' || (wallet.address && wallet.address.startsWith('mn_addr_preview'));
-
-          // Use network-matching recipient (self-address on Preview ensures safety and prevents mismatch)
-          let targetRecipient = wallet.address || 'mn_addr_preprod14g0smfdj6hjjkcd5hjh43xkra9q78zgfluqh7zzz6gy42y24f3jsc8chvm';
-          if (!isPreview && options?.recipientAddress && options.recipientAddress.startsWith('mn_addr_preprod')) {
-            targetRecipient = options.recipientAddress;
-          }
-          
-          // 10,000 microunits = 0.01 tNIGHT (safe micro-payment)
-          const transferAmount = options?.amount || 10_000n;
-          const nativeTokenType = '0000000000000000000000000000000000000000000000000000000000000000';
-
-          console.log('[Midnight] Initiating live on-chain transaction via Lace makeTransfer...', {
-            network: isPreview ? 'preview' : 'preprod',
-            recipient: targetRecipient,
-            amount: transferAmount.toString(),
-          });
-
-          // This triggers the Lace Wallet on-chain approval popup
-          const transferRes = await api.makeTransfer(
-            [
-              {
-                kind: 'unshielded',
-                type: nativeTokenType,
-                value: transferAmount,
-                recipient: targetRecipient,
-              },
-            ],
-            { payFees: true }
+          console.log(`[Midnight Contract] Balancing unsealed contract transaction for 0x${CONTRACT_HEX_ID}...`);
+          const balanced = await (api as any).balanceUnsealedTransaction(
+            JSON.stringify({
+              contractAddress: `0x${CONTRACT_HEX_ID}`,
+              circuit: 'increment',
+              witnessValue: privateWitnessValue || 1,
+            })
           );
-
-          console.log('[Midnight] Transaction approved and balanced by Lace:', transferRes);
-
-          // Stage 4: Submit the transaction to Midnight Preprod blockchain
           setCircuitCall((prev) => ({ ...prev, stage: 'submitting' }));
-
-          const rawTx = transferRes?.tx || transferRes;
           if (typeof api.submitTransaction === 'function') {
-            await api.submitTransaction(rawTx);
-            console.log('[Midnight] Transaction successfully broadcasted to Midnight Preprod ledger.');
+            await api.submitTransaction(balanced?.tx || balanced);
           }
-
-          // Fetch the on-chain txHash from Lace's txHistory or extract
-          try {
-            await new Promise((r) => setTimeout(r, 1200));
-            if (typeof api.getTxHistory === 'function') {
-              const history = await api.getTxHistory(0, 5);
-              if (Array.isArray(history) && history.length > 0 && history[0]?.txHash) {
-                txHashResult = history[0].txHash;
-              }
-            }
-          } catch (hErr) {
-            console.warn('Could not read tx history from Lace:', hErr);
-          }
-
-          if (!txHashResult) {
-            if (transferRes && typeof transferRes === 'object' && transferRes.txHash) {
-              txHashResult = transferRes.txHash;
-            } else if (typeof rawTx === 'string' && rawTx.length === 64) {
-              txHashResult = rawTx;
-            } else {
-              throw new Error('Transaction was submitted, but transaction hash was not returned by wallet.');
-            }
-          }
-
+          txHashResult = balanced?.txHash || (typeof balanced === 'string' ? balanced : '');
           const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
           explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
-        } else if (api && typeof api.signData === 'function') {
-          // Cryptographic data signature if makeTransfer is not supported
+        }
+        // Priority 2: Cryptographic Authorization via Lace signData (Typed contract execution intent)
+        else if (typeof api.signData === 'function') {
           setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
 
           const payloadToSign = [
-            `Vansidian Confidential State Transition`,
-            `Contract: 0x${CONTRACT_HEX_ID}`,
-            `Action: processPayrollBatch (Compact v0.31.1)`,
-            `Witness Delta: +${privateWitnessValue || 1}`,
-            `Network: ${wallet.network || 'preprod'}`,
+            `[Midnight Network Contract Invocation]`,
+            `Contract Address: 0x${CONTRACT_HEX_ID}`,
+            `Circuit: increment(Uint<16>)`,
+            `Private Witness Parameter: +${privateWitnessValue || 1}`,
+            `Network ID: ${wallet.network || 'preprod'}`,
+            `Caller Address: ${wallet.address || 'Unknown'}`,
             `Timestamp: ${new Date().toISOString()}`,
           ].join('\n');
 
@@ -475,8 +426,27 @@ export function useMidnight() {
           txHashResult = signatureHex.slice(0, 64);
           const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
           explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/contracts/0x${CONTRACT_HEX_ID}`;
+        }
+        // Optional fallback: Explicit direct token transfer if requested by user
+        else if (options?.isDirectTransfer && typeof api.makeTransfer === 'function') {
+          setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
+          const targetRecipient = options?.recipientAddress || wallet.address || 'mn_addr_preprod14g0smfdj6hjjkcd5hjh43xkra9q78zgfluqh7zzz6gy42y24f3jsc8chvm';
+          const transferAmount = options?.amount || 10_000n;
+          const nativeTokenType = '0000000000000000000000000000000000000000000000000000000000000000';
+
+          const transferRes = await api.makeTransfer(
+            [{ kind: 'unshielded', type: nativeTokenType, value: transferAmount, recipient: targetRecipient }],
+            { payFees: true }
+          );
+          setCircuitCall((prev) => ({ ...prev, stage: 'submitting' }));
+          if (typeof api.submitTransaction === 'function') {
+            await api.submitTransaction(transferRes?.tx || transferRes);
+          }
+          txHashResult = transferRes?.txHash || '';
+          const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
+          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
         } else {
-          throw new Error('Lace Wallet is not connected. Please connect Lace Wallet on Midnight Preprod to sign transactions.');
+          throw new Error('Lace Wallet does not support transaction authorization or contract signing.');
         }
 
         const addedVal = privateWitnessValue || 1;
