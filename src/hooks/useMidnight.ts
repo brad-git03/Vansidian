@@ -55,23 +55,22 @@ export function useMidnight() {
 
   const getLaceConnector = useCallback((): InitialAPI | any | null => {
     if (typeof window === 'undefined') return null;
-    const win = window as any;
+    const w = window as any;
 
-    // 1. Official Midnight DApp Connector API v4 standard: window.midnight.mnLace
-    if (win.midnight?.mnLace) {
-      return win.midnight.mnLace;
-    }
-
-    // 2. Discover any registered Midnight wallet under window.midnight namespace
-    if (win.midnight && typeof win.midnight === 'object') {
-      const wallets = Object.values(win.midnight);
-      if (wallets.length > 0 && ((wallets[0] as any)?.connect || (wallets[0] as any)?.enable)) {
-        return wallets[0];
+    if (w.midnight) {
+      if (w.midnight.mnLace) return w.midnight.mnLace;
+      if (w.midnight.lace) return w.midnight.lace;
+      if (w.midnight['midnight-lace']) return w.midnight['midnight-lace'];
+      for (const k of Object.keys(w.midnight)) {
+        const item = w.midnight[k];
+        if (item && (typeof item.connect === 'function' || typeof item.enable === 'function')) {
+          return item;
+        }
       }
     }
 
-    // 3. Fallbacks for older / alternative naming conventions
-    return win.midnight?.lace || win.midnight?.['midnight-lace'] || win.cardano?.lace || null;
+    if (w.cardano?.lace) return w.cardano.lace;
+    return null;
   }, []);
 
   const checkWalletInstalled = useCallback((): boolean => {
@@ -88,6 +87,18 @@ export function useMidnight() {
     isConnecting: false,
     hasExtension: false,
   });
+
+  // Continuously detect Lace extension injection
+  useEffect(() => {
+    const check = () => {
+      const conn = getLaceConnector();
+      const has = Boolean(conn);
+      setWallet((prev) => (prev.hasExtension !== has ? { ...prev, hasExtension: has } : prev));
+    };
+    check();
+    const timer = setInterval(check, 1000);
+    return () => clearInterval(timer);
+  }, [getLaceConnector]);
 
   const [privateWitnessValue, setPrivateWitnessValue] = useState<number>(1);
   const [publicCounterState, setPublicCounterState] = useState<number>(0);
@@ -163,7 +174,7 @@ export function useMidnight() {
   const connectWallet = useCallback(async () => {
     // Prevent duplicate concurrent connection calls
     if (isConnectingRef.current) {
-      console.warn('Wallet connection already in progress, ignoring duplicate call.');
+      console.warn('[Lace] Wallet connection already in progress, ignoring duplicate call.');
       return;
     }
     isConnectingRef.current = true;
@@ -173,170 +184,177 @@ export function useMidnight() {
 
       if (!connector) {
         throw new Error(
-          'Lace Wallet extension not detected in browser. Please install Lace Wallet from https://www.lace.io/ with Midnight support.'
+          'Midnight Lace Wallet extension was not detected. Please ensure the extension is enabled and unlocked.'
         );
       }
 
+      console.log('[Lace] Connecting to Midnight Lace wallet on Preprod...');
       let targetNetwork = 'preprod';
       let api: ConnectedAPI | any = null;
 
-      // Follow official Midnight guide: connector.connect(networkId)
-      // Auto-fallback if user's Lace is currently set to Preview instead of Preprod
+      // Connect to Midnight Preprod Testnet
       if (typeof connector.connect === 'function') {
-        const timeoutPromise = (sec: number) =>
-          new Promise<never>((_, reject) =>
-            setTimeout(
-              () =>
-                reject(
-                  new Error(
-                    'Connection request timed out. Please check if the Lace authorization popup window was opened behind your browser or blocked.'
-                  )
-                ),
-              sec * 1000
-            )
-          );
-
         try {
-          api = await Promise.race([connector.connect('preprod'), timeoutPromise(45)]);
+          api = await connector.connect('preprod');
           targetNetwork = 'preprod';
-        } catch (connErr: any) {
-          const errStr = (connErr?.message || connErr?.reason || '').toLowerCase();
+        } catch (firstErr: any) {
+          const errStr = (firstErr?.message || firstErr?.reason || '').toLowerCase();
           if (errStr.includes('network id mismatch') || errStr.includes('mismatch')) {
-            console.warn('Lace network mismatch with preprod, trying connection with preview...');
-            try {
-              api = await Promise.race([connector.connect('preview'), timeoutPromise(45)]);
-              targetNetwork = 'preview';
-            } catch (prevErr: any) {
-              console.warn('connector.connect preview failed, trying enable():', prevErr);
-              if (typeof connector.enable === 'function') {
-                api = await Promise.race([connector.enable(), timeoutPromise(30)]);
-              } else {
-                throw prevErr;
-              }
+            throw new Error(
+              'Network ID mismatch: Your Lace Wallet is on a different network (e.g. Preview). Please open Lace Settings ⚙️ and switch network to Midnight Preprod.'
+            );
+          }
+          console.warn('[Lace] .connect("preprod") note, trying fallback connection...', firstErr);
+          try {
+            api = await connector.connect();
+          } catch {
+            if (typeof connector.enable === 'function') {
+              api = await connector.enable();
+            } else {
+              throw firstErr;
             }
-          } else if (typeof connector.enable === 'function') {
-            api = await Promise.race([connector.enable(), timeoutPromise(30)]);
-          } else {
-            throw connErr;
           }
         }
       } else if (typeof connector.enable === 'function') {
         api = await connector.enable();
-      } else {
-        api = connector;
+      }
+
+      if (!api) {
+        throw new Error('Could not establish API connection with Midnight Lace. Please ensure the extension is unlocked.');
       }
 
       connectedApiRef.current = api;
 
-      let unshieldedAddress = 'mn_addr_preprod14g0smfdj6hjjkcd5hjh43xkra9q78zgfluqh7zzz6gy42y24f3jsc8chvm';
+      let address = '';
       let shieldedAddress: string | null = null;
       let dustBalance: string | null = null;
-      let currentNetwork = targetNetwork;
 
-      if (api) {
-        // Fast unshielded address retrieval (immediate)
-        if (typeof api.getUnshieldedAddress === 'function') {
-          try {
-            const res = await Promise.race([
-              api.getUnshieldedAddress(),
-              new Promise<any>((resolve) => setTimeout(() => resolve(null), 2500)),
-            ]);
-            if (typeof res === 'string' && res) {
-              unshieldedAddress = res;
-            } else if (res?.unshieldedAddress) {
-              unshieldedAddress = res.unshieldedAddress;
-            }
-          } catch (e: any) {
-            console.warn('Fast unshielded address fetch note:', e);
+      // 1. Get official unshielded address
+      if (typeof api.getUnshieldedAddress === 'function') {
+        try {
+          const addrRes = await api.getUnshieldedAddress();
+          if (addrRes?.unshieldedAddress) {
+            address = addrRes.unshieldedAddress;
+          } else if (typeof addrRes === 'string') {
+            address = addrRes;
           }
+        } catch (e) {
+          console.warn('[Lace] getUnshieldedAddress error:', e);
+        }
+      }
+
+      // 2. Fallback to shielded address if unshielded not yet returned
+      if (!address && typeof api.getShieldedAddresses === 'function') {
+        try {
+          const addrRes = await api.getShieldedAddresses();
+          if (addrRes?.shieldedAddress) {
+            address = addrRes.shieldedAddress;
+            shieldedAddress = addrRes.shieldedAddress;
+          } else if (Array.isArray(addrRes?.shieldedAddresses) && addrRes.shieldedAddresses.length > 0) {
+            address = addrRes.shieldedAddresses[0];
+            shieldedAddress = addrRes.shieldedAddresses[0];
+          }
+        } catch (e) {}
+      }
+
+      // 3. Fallback to used / change addresses
+      if (!address) {
+        if (typeof api.getUsedAddresses === 'function') {
+          const usedAddrs = await api.getUsedAddresses();
+          if (usedAddrs && usedAddrs.length > 0) address = usedAddrs[0];
+        } else if (typeof api.getChangeAddress === 'function') {
+          address = await api.getChangeAddress();
         } else if (typeof api.state === 'function') {
           try {
             const state = await api.state();
-            if (state?.unshieldedAddress) unshieldedAddress = state.unshieldedAddress;
-            else if (state?.address) unshieldedAddress = state.address;
-            if (state?.network) currentNetwork = state.network;
-          } catch (e) {
-            console.warn('Failed to read state() from connector:', e);
-          }
+            if (state?.unshieldedAddress) address = state.unshieldedAddress;
+            else if (state?.address) address = state.address;
+          } catch (e) {}
         }
+      }
 
-        // Parallel query for shielded address, dust balance, and configuration (non-blocking)
+      // 4. Default Preprod address fallback
+      if (!address) {
+        address = 'mn_addr_preprod14g0smfdj6hjjkcd5hjh43xkra9q78zgfluqh7zzz6gy42y24f3jsc8chvm';
+      }
+
+      // Validate network configuration from Lace
+      if (typeof api.getConfiguration === 'function') {
         try {
-          const [shieldedRes, dustRes, configRes] = await Promise.allSettled([
-            typeof api.getShieldedAddresses === 'function'
-              ? Promise.race([
-                  api.getShieldedAddresses(),
-                  new Promise<any>((resolve) => setTimeout(() => resolve(null), 3000)),
-                ])
-              : Promise.resolve(null),
-            typeof api.getDustBalance === 'function'
-              ? Promise.race([
-                  api.getDustBalance(),
-                  new Promise<any>((resolve) => setTimeout(() => resolve(null), 3000)),
-                ])
-              : Promise.resolve(null),
-            typeof api.getConfiguration === 'function'
-              ? Promise.race([
-                  api.getConfiguration(),
-                  new Promise<any>((resolve) => setTimeout(() => resolve(null), 2000)),
-                ])
-              : Promise.resolve(null),
-          ]);
-
-          if (shieldedRes.status === 'fulfilled' && shieldedRes.value) {
-            const val = shieldedRes.value;
-            if (Array.isArray(val?.shieldedAddresses) && val.shieldedAddresses.length > 0) {
-              shieldedAddress = val.shieldedAddresses[0];
-            } else if (val?.shieldedAddress) {
-              shieldedAddress = val.shieldedAddress;
-            }
+          const config = await api.getConfiguration();
+          const endpoints = `${config?.indexerUri || ''} ${config?.substrateNodeUri || ''}`.toLowerCase();
+          if (endpoints.includes('preprod')) {
+            targetNetwork = 'preprod';
           }
-
-          if (dustRes.status === 'fulfilled' && dustRes.value?.balance !== undefined) {
-            dustBalance = dustRes.value.balance.toString();
-          }
-
-          if (configRes.status === 'fulfilled' && configRes.value?.networkId) {
-            currentNetwork = configRes.value.networkId;
-          }
-        } catch (enrichErr) {
-          console.warn('Metadata enrichment error (non-fatal):', enrichErr);
+        } catch (cErr) {
+          console.warn('[Lace] Network configuration detection note:', cErr);
         }
+      }
+
+      if (address) {
+        const lowerAddr = address.toLowerCase();
+        if (lowerAddr.includes('preprod') || lowerAddr.startsWith('mn_addr_preprod') || lowerAddr.startsWith('mn_preprod')) {
+          targetNetwork = 'preprod';
+        }
+      }
+
+      // Enrich dust balance and shielded address asynchronously in parallel (non-blocking)
+      try {
+        const [dustRes, shieldRes] = await Promise.allSettled([
+          typeof api.getDustBalance === 'function' ? api.getDustBalance() : Promise.resolve(null),
+          !shieldedAddress && typeof api.getShieldedAddresses === 'function' ? api.getShieldedAddresses() : Promise.resolve(null),
+        ]);
+        if (dustRes.status === 'fulfilled' && dustRes.value?.balance !== undefined) {
+          dustBalance = dustRes.value.balance.toString();
+        }
+        if (shieldRes.status === 'fulfilled' && shieldRes.value) {
+          const val = shieldRes.value;
+          if (val?.shieldedAddress) shieldedAddress = val.shieldedAddress;
+          else if (Array.isArray(val?.shieldedAddresses) && val.shieldedAddresses.length > 0) shieldedAddress = val.shieldedAddresses[0];
+        }
+      } catch (e) {
+        console.warn('[Lace] Non-fatal balance enrichment note:', e);
       }
 
       setWallet({
         isConnected: true,
-        address: unshieldedAddress,
+        address,
         shieldedAddress,
         dustBalance,
-        network: currentNetwork,
+        network: targetNetwork,
         error: null,
         isConnecting: false,
         hasExtension: true,
         walletName: connector.name || 'Lace',
       });
     } catch (err: any) {
-      console.error('Wallet connection error:', err);
-      let errorMsg = err?.message || 'Failed to connect Lace wallet.';
-      if (
+      console.error('[Lace] Wallet authorization error:', err);
+      const isDeclined = 
+        err?.code === 'Rejected' ||
+        err?.code === 'PermissionRejected' ||
         err?.name === 'RemoteApiShutdownError' ||
-        errorMsg.toLowerCase().includes('midnight-authenticator') ||
-        errorMsg.toLowerCase().includes('shutdown')
-      ) {
-        errorMsg = 'Connection authorization window was closed or interrupted. Please click Connect and approve the request in your Lace Wallet popup.';
+        err?.message?.toLowerCase().includes('reject') || 
+        err?.message?.toLowerCase().includes('decline') || 
+        err?.message?.toLowerCase().includes('cancel') ||
+        err?.message?.toLowerCase().includes('midnight-authenticator') ||
+        err?.message?.toLowerCase().includes('shutdown') ||
+        err?.reason?.toLowerCase().includes('reject') ||
+        err?.code === -1;
+
+      let errorMsg = 'Failed to authorize Midnight Lace wallet.';
+      if (isDeclined) {
+        errorMsg = 'Connection request was cancelled or closed in Lace wallet.';
+      } else if (err?.code === 'Disconnected' || err?.message?.toLowerCase().includes('locked')) {
+        errorMsg = 'Midnight Lace extension is locked. Please unlock the extension with your password and try again.';
       } else if (
-        errorMsg.toLowerCase().includes('network id mismatch') ||
+        err?.message?.toLowerCase().includes('network id mismatch') ||
         err?.reason?.toLowerCase().includes('network id mismatch')
       ) {
-        errorMsg = 'Network ID mismatch: Your Lace Wallet is on a different network (e.g. Preview or Cardano). Please open Lace Settings ⚙️ and switch network to Midnight Preprod.';
-      } else if (
-        errorMsg.toLowerCase().includes('reject') ||
-        errorMsg.toLowerCase().includes('denied') ||
-        errorMsg.toLowerCase().includes('declined') ||
-        errorMsg.toLowerCase().includes('cancel')
-      ) {
-        errorMsg = 'Connection request was cancelled or declined in Lace Wallet.';
+        errorMsg = 'Network ID mismatch: Please ensure your Lace Wallet is set to Midnight Preprod or Preview.';
+      } else if (err?.reason || err?.message) {
+        errorMsg = err.reason || err.message;
       }
+
       setWallet((prev) => ({
         ...prev,
         isConnected: false,
