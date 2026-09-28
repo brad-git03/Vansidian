@@ -270,7 +270,7 @@ export async function createBrowserProviders(
 
   // 4. Browser-native Private State Provider
   const privateStateProvider = new BrowserPrivateStateProvider();
-  privateStateProvider.setContractAddress(`0x${CONTRACT_HEX_ID}`);
+  privateStateProvider.setContractAddress(CONTRACT_HEX_ID.replace(/^0x/, ''));
 
   // 5. Resolve user keys from Lace
   let shieldedInfo: any = null;
@@ -469,10 +469,11 @@ export async function executeOnChainContractCall(
 
   const providers = await createBrowserProviders(apiInstance, 'preprod');
 
-  console.log(`[Vansidian ZK] Binding to deployed contract at 0x${CONTRACT_HEX_ID}...`);
+  const rawContractAddress = CONTRACT_HEX_ID.replace(/^0x/, '');
+  console.log(`[Vansidian ZK] Binding to deployed contract at ${rawContractAddress}...`);
   const deployed = await findDeployedContract(providers as any, {
     compiledContract: compiledContract as any,
-    contractAddress: `0x${CONTRACT_HEX_ID}`,
+    contractAddress: rawContractAddress,
     privateStateId: 'vansidianPrivateState',
     initialPrivateState: {},
   });
