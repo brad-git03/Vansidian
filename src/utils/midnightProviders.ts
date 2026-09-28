@@ -1,3 +1,11 @@
+import { Buffer } from 'buffer';
+if (typeof (globalThis as any).Buffer === 'undefined') {
+  (globalThis as any).Buffer = Buffer;
+}
+if (typeof (window as any).Buffer === 'undefined') {
+  (window as any).Buffer = Buffer;
+}
+
 import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
