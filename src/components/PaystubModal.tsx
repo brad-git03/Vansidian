@@ -136,21 +136,10 @@ export const PaystubModal: React.FC<PaystubModalProps> = ({ isOpen, onClose, dat
 
             <div className="space-y-2 text-[11px]">
               <div>
-                <span className="text-slate-500 block">Verified Transaction Hash:</span>
+                <span className="text-slate-500 block">Verified Cryptographic Proof (Lace Witness Signature):</span>
                 <div className="flex items-center justify-between text-purple-200 mt-0.5">
-                  <span className="truncate pr-2">{data.txHash}</span>
+                  <span className="truncate pr-2 font-mono">{data.txHash}</span>
                   <div className="flex items-center gap-2 shrink-0">
-                    {data.explorerUrl && (
-                      <a
-                        href={data.explorerUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-purple-400 hover:text-white underline cursor-pointer flex items-center gap-1 text-[11px]"
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                        <span>Explorer</span>
-                      </a>
-                    )}
                     <button
                       onClick={handleCopyHash}
                       className="text-purple-400 hover:text-purple-300 shrink-0 cursor-pointer flex items-center gap-1"
@@ -165,13 +154,26 @@ export const PaystubModal: React.FC<PaystubModalProps> = ({ isOpen, onClose, dat
               {data.batchRootHash && (
                 <div>
                   <span className="text-slate-500 block">Merkle Batch Root Hash:</span>
-                  <span className="text-indigo-300 truncate block mt-0.5">{data.batchRootHash}</span>
+                  <span className="text-indigo-300 truncate block mt-0.5 font-mono">{data.batchRootHash}</span>
                 </div>
               )}
 
               <div>
                 <span className="text-slate-500 block">Target Preprod Smart Contract:</span>
-                <span className="text-slate-300 truncate block mt-0.5">{PREPROD_CONTRACT_ADDRESS}</span>
+                <div className="flex items-center justify-between text-slate-300 mt-0.5">
+                  <span className="truncate pr-2 font-mono">{PREPROD_CONTRACT_ADDRESS}</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <a
+                      href={data.explorerUrl || `https://preprod.midnightexplorer.com/contracts/${PREPROD_CONTRACT_ADDRESS}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-purple-400 hover:text-white underline cursor-pointer flex items-center gap-1 text-[11px]"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      <span>Contract Explorer</span>
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

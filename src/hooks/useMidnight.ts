@@ -480,7 +480,7 @@ export function useMidnight() {
           const cleanSig = signatureHex.replace(/^0x/, '');
           txHashResult = cleanSig.length >= 64 ? cleanSig.slice(0, 64) : cleanSig.padEnd(64, '0');
           const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
-          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
+          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/contracts/0x${CONTRACT_HEX_ID}`;
         }
         // Priority 2: Pre-serialized Unsealed Transaction balancing (if serialized binary transaction is provided)
         else if (
