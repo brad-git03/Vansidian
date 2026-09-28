@@ -415,6 +415,7 @@ export const AppDashboard: React.FC<Props> = ({
               {(view === 'overview' || view === 'payroll') && (
                 <PayrollRoster
                   isConnected={wallet.isConnected}
+                  wallet={wallet}
                   onDisburseBatch={async (data) => await onExecute(data)}
                   isProcessing={circuitState.isCalling}
                   onOpenPaystub={onOpenPaystub}
@@ -538,6 +539,7 @@ export const AppDashboard: React.FC<Props> = ({
             <EmployeePortal
               onOpenPaystub={onOpenPaystub}
               isConnected={wallet.isConnected}
+              connectedAddress={wallet.address}
             />
           )}
         </main>

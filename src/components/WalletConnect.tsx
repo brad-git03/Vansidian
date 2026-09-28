@@ -108,14 +108,26 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
               </div>
             )}
 
-            {wallet.dustBalance && (
-              <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-amber-400" /> DUST Balance
-                </span>
-                <span className="font-mono text-xs text-amber-300 font-bold">
-                  {wallet.dustBalance} DUST
-                </span>
+            <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
+              <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-amber-400" /> Preprod Gas (tDUST)
+              </span>
+              <span className="font-mono text-xs text-amber-300 font-bold">
+                {wallet.dustBalance ? `${wallet.dustBalance} tDUST` : '0 tDUST'}
+              </span>
+            </div>
+
+            {(!wallet.dustBalance || wallet.dustBalance === '0') && (
+              <div className="p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-lg text-amber-200 text-xs flex items-center justify-between gap-2">
+                <span>Need gas for on-chain proofs?</span>
+                <a
+                  href="https://midnight-tmnight-preprod.nethermind.dev"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 underline font-medium"
+                >
+                  Claim Faucet <ExternalLink className="w-3 h-3" />
+                </a>
               </div>
             )}
           </div>
