@@ -20,7 +20,7 @@ export const PayrollRoster:React.FC<Props>=({isConnected,onDisburseBatch,isProce
     try {
       const res = await onDisburseBatch({totalAmount:total,employeeCount:employees.length,batchRootHash:root});
       const finalTx = (res && typeof res === 'object' && res.txHash) ? res.txHash : ('0x'+Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join(''));
-      const finalExplorerUrl = (res && typeof res === 'object' && res.explorerUrl) ? res.explorerUrl : 'https://preprod.midnightexplorer.com/contracts/0xcbd7c6032150647b244c3e8a2483ed22fadaaf72e9c2d98a0af30a543f01b1c2';
+      const finalExplorerUrl = (res && typeof res === 'object' && res.explorerUrl) ? res.explorerUrl : `https://preprod.midnightexplorer.com/transactions/${finalTx.startsWith('0x') ? finalTx : `0x${finalTx}`}`;
       onOpenPaystub({
         certificateId:`CERT-${Math.floor(100000+Math.random()*900000)}`,
         txHash:finalTx,

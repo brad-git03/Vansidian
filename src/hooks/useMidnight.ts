@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { InitialAPI, ConnectedAPI } from '@midnight-ntwrk/dapp-connector-api';
 import { fetchLiveContractState, OnChainContractState } from '../utils/indexer';
+import { executeOnChainContractCall } from '../utils/midnightProviders';
 
 export interface WalletState {
   isConnected: boolean;
@@ -430,8 +431,42 @@ export function useMidnight() {
           throw new Error('Lace Wallet is not connected. Please connect Lace Wallet on Midnight Preprod to execute this circuit.');
         }
 
-        // Priority 1: Cryptographic Authorization via Lace signData (Official typed contract/payroll execution intent)
-        if (typeof api.signData === 'function') {
+        // Priority 1: Genuine On-Chain Broadcast via Midnight Proof Server & Lace (if container is online)
+        let onChainSuccess = false;
+        try {
+          const isPayrollBatch = Boolean(options?.batchRootHash || options?.totalAmount);
+          console.log('[Midnight Engine] Checking for active Midnight Proof Server on port 6300...');
+          const onChainRes = await executeOnChainContractCall(api, {
+            circuit: isPayrollBatch ? 'processPayrollBatch' : 'increment',
+            witnessValue: privateWitnessValue || 1,
+            totalAmount: options?.totalAmount,
+            employeeCount: options?.employeeCount,
+            batchRootHash: options?.batchRootHash,
+            onStageChange: (st) => setCircuitCall((prev) => ({ ...prev, stage: st })),
+          });
+
+          if (onChainRes?.txHash) {
+            txHashResult = onChainRes.txHash;
+            explorerUrlResult = onChainRes.explorerUrl;
+            onChainSuccess = true;
+            console.log('[Midnight Engine] Real on-chain transaction broadcasted successfully:', txHashResult);
+            setCircuitCall((prev) => ({ ...prev, stage: 'confirmed', txHash: txHashResult }));
+          }
+        } catch (onChainError: any) {
+          console.warn('[Midnight Engine] On-chain proving encounter notice:', onChainError);
+          const errStr = (onChainError?.message || String(onChainError)).toLowerCase();
+          if (
+            errStr.includes('reject') ||
+            errStr.includes('denied') ||
+            errStr.includes('cancel') ||
+            errStr.includes('declined')
+          ) {
+            throw onChainError;
+          }
+        }
+
+        // Priority 2: Fallback to Cryptographic Authorization via Lace signData (if proof server offline)
+        if (!onChainSuccess && typeof api.signData === 'function') {
           setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
 
           const isPayrollBatch = Boolean(options?.batchRootHash || options?.totalAmount);

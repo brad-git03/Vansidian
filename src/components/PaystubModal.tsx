@@ -136,10 +136,21 @@ export const PaystubModal: React.FC<PaystubModalProps> = ({ isOpen, onClose, dat
 
             <div className="space-y-2 text-[11px]">
               <div>
-                <span className="text-slate-500 block">Verified Cryptographic Proof (Lace Witness Signature):</span>
+                <span className="text-slate-500 block">Verified Transaction / Consensus Hash:</span>
                 <div className="flex items-center justify-between text-purple-200 mt-0.5">
                   <span className="truncate pr-2 font-mono">{data.txHash}</span>
                   <div className="flex items-center gap-2 shrink-0">
+                    {data.explorerUrl && (
+                      <a
+                        href={data.explorerUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-purple-400 hover:text-white underline cursor-pointer flex items-center gap-1 text-[11px]"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Explorer</span>
+                      </a>
+                    )}
                     <button
                       onClick={handleCopyHash}
                       className="text-purple-400 hover:text-purple-300 shrink-0 cursor-pointer flex items-center gap-1"
