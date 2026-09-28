@@ -81,7 +81,7 @@ export function App() {
   if (currentView === 'app') {
     return (
       <>
-        {wallet.isConnecting && <SystemTransition mode="wallet" />}
+        {wallet.isConnecting && <SystemTransition mode="wallet" onCancel={disconnectWallet} />}
         <AppDashboard
           wallet={wallet}
           onConnect={connectWallet}
@@ -111,7 +111,7 @@ export function App() {
   // ----------------------------------------------------------------------
   return (
     <div className="min-h-screen bg-[var(--canvas)] text-slate-100 flex flex-col font-sans">
-      {wallet.isConnecting && <SystemTransition mode="wallet" />}
+      {wallet.isConnecting && <SystemTransition mode="wallet" onCancel={disconnectWallet} />}
       {/* Sticky Modern SaaS Top Navbar */}
       <Navbar
         wallet={wallet}

@@ -183,26 +183,39 @@ export function useMidnight() {
       // Follow official Midnight guide: connector.connect(networkId)
       // Auto-fallback if user's Lace is currently set to Preview instead of Preprod
       if (typeof connector.connect === 'function') {
+        const timeoutPromise = (sec: number) =>
+          new Promise<never>((_, reject) =>
+            setTimeout(
+              () =>
+                reject(
+                  new Error(
+                    'Connection request timed out. Please check if the Lace authorization popup window was opened behind your browser or blocked.'
+                  )
+                ),
+              sec * 1000
+            )
+          );
+
         try {
-          api = await connector.connect('preprod');
+          api = await Promise.race([connector.connect('preprod'), timeoutPromise(45)]);
           targetNetwork = 'preprod';
         } catch (connErr: any) {
           const errStr = (connErr?.message || connErr?.reason || '').toLowerCase();
           if (errStr.includes('network id mismatch') || errStr.includes('mismatch')) {
             console.warn('Lace network mismatch with preprod, trying connection with preview...');
             try {
-              api = await connector.connect('preview');
+              api = await Promise.race([connector.connect('preview'), timeoutPromise(45)]);
               targetNetwork = 'preview';
             } catch (prevErr: any) {
               console.warn('connector.connect preview failed, trying enable():', prevErr);
               if (typeof connector.enable === 'function') {
-                api = await connector.enable();
+                api = await Promise.race([connector.enable(), timeoutPromise(30)]);
               } else {
                 throw prevErr;
               }
             }
           } else if (typeof connector.enable === 'function') {
-            api = await connector.enable();
+            api = await Promise.race([connector.enable(), timeoutPromise(30)]);
           } else {
             throw connErr;
           }
@@ -221,33 +234,20 @@ export function useMidnight() {
       let currentNetwork = targetNetwork;
 
       if (api) {
-        // Official DApp Connector API v4: hint usage of methods to request permissions
-        if (typeof api.hintUsage === 'function') {
-          try {
-            await api.hintUsage([
-              'getUnshieldedAddress',
-              'getShieldedAddresses',
-              'getDustBalance',
-              'getConfiguration',
-              'makeTransfer',
-              'submitTransaction',
-            ]);
-          } catch (hintErr) {
-            console.warn('hintUsage note:', hintErr);
-          }
-        }
-
-        // Query unshielded address (Bech32m)
+        // Fast unshielded address retrieval (immediate)
         if (typeof api.getUnshieldedAddress === 'function') {
           try {
-            const res = await api.getUnshieldedAddress();
+            const res = await Promise.race([
+              api.getUnshieldedAddress(),
+              new Promise<any>((resolve) => setTimeout(() => resolve(null), 2500)),
+            ]);
             if (typeof res === 'string' && res) {
               unshieldedAddress = res;
             } else if (res?.unshieldedAddress) {
               unshieldedAddress = res.unshieldedAddress;
             }
           } catch (e: any) {
-            console.warn('Failed to retrieve unshielded address from Lace (wallet may be in locked background mode):', e);
+            console.warn('Fast unshielded address fetch note:', e);
           }
         } else if (typeof api.state === 'function') {
           try {
@@ -260,42 +260,47 @@ export function useMidnight() {
           }
         }
 
-        // Query shielded address
-        if (typeof api.getShieldedAddresses === 'function') {
-          try {
-            const res = await api.getShieldedAddresses();
-            if (Array.isArray(res?.shieldedAddresses) && res.shieldedAddresses.length > 0) {
-              shieldedAddress = res.shieldedAddresses[0];
-            } else if (res?.shieldedAddress) {
-              shieldedAddress = res.shieldedAddress;
-            }
-          } catch (e) {
-            console.warn('Failed to retrieve shielded address from Lace:', e);
-          }
-        }
+        // Parallel query for shielded address, dust balance, and configuration (non-blocking)
+        try {
+          const [shieldedRes, dustRes, configRes] = await Promise.allSettled([
+            typeof api.getShieldedAddresses === 'function'
+              ? Promise.race([
+                  api.getShieldedAddresses(),
+                  new Promise<any>((resolve) => setTimeout(() => resolve(null), 3000)),
+                ])
+              : Promise.resolve(null),
+            typeof api.getDustBalance === 'function'
+              ? Promise.race([
+                  api.getDustBalance(),
+                  new Promise<any>((resolve) => setTimeout(() => resolve(null), 3000)),
+                ])
+              : Promise.resolve(null),
+            typeof api.getConfiguration === 'function'
+              ? Promise.race([
+                  api.getConfiguration(),
+                  new Promise<any>((resolve) => setTimeout(() => resolve(null), 2000)),
+                ])
+              : Promise.resolve(null),
+          ]);
 
-        // Query dust balance
-        if (typeof api.getDustBalance === 'function') {
-          try {
-            const res = await api.getDustBalance();
-            if (res?.balance !== undefined) {
-              dustBalance = res.balance.toString();
+          if (shieldedRes.status === 'fulfilled' && shieldedRes.value) {
+            const val = shieldedRes.value;
+            if (Array.isArray(val?.shieldedAddresses) && val.shieldedAddresses.length > 0) {
+              shieldedAddress = val.shieldedAddresses[0];
+            } else if (val?.shieldedAddress) {
+              shieldedAddress = val.shieldedAddress;
             }
-          } catch (e) {
-            console.warn('Failed to retrieve dust balance from Lace:', e);
           }
-        }
 
-        // Query network configuration
-        if (typeof api.getConfiguration === 'function') {
-          try {
-            const config = await api.getConfiguration();
-            if (config?.networkId) {
-              currentNetwork = config.networkId;
-            }
-          } catch (e) {
-            console.warn('Failed to retrieve network config from Lace:', e);
+          if (dustRes.status === 'fulfilled' && dustRes.value?.balance !== undefined) {
+            dustBalance = dustRes.value.balance.toString();
           }
+
+          if (configRes.status === 'fulfilled' && configRes.value?.networkId) {
+            currentNetwork = configRes.value.networkId;
+          }
+        } catch (enrichErr) {
+          console.warn('Metadata enrichment error (non-fatal):', enrichErr);
         }
       }
 
