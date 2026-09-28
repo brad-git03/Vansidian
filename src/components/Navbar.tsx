@@ -4,7 +4,7 @@ import { WalletState } from '../hooks/useMidnight';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 interface NavbarProps { wallet:WalletState; onConnect:()=>void; onDisconnect:()=>void; onLaunchApp:()=>void; }
 export const Navbar:React.FC<NavbarProps>=({wallet,onConnect,onDisconnect,onLaunchApp})=>{
- const [open,setOpen]=useState(false); const links=[['Home','#hero'],['Product','#about'],['How it works','#how-it-works'],['Security','#security']];
+ const [open,setOpen]=useState(false); const links=[['Home','#hero'],['Product','#about'],['Settlements','#settlements'],['How it works','#how-it-works'],['Security','#security']];
  return <header className="sticky top-0 z-50 bg-[var(--canvas)] px-3 pt-3 sm:px-5 sm:pt-4">
   <div className="mx-auto flex h-16 max-w-[1380px] items-center justify-between rounded-t-[24px] border-x border-t border-white/[.07] bg-[var(--surface-1)] px-4 sm:px-6">
    <a href="#hero" aria-label="Vansidian home"><Logo size={34} showText/></a>

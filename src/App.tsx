@@ -10,6 +10,7 @@ import { PrivacyBreakdown } from './components/PrivacyBreakdown';
 import { WalletConnect } from './components/WalletConnect';
 import { AppDashboard } from './components/AppDashboard';
 import { PaystubModal, PaystubData } from './components/PaystubModal';
+import { LiveSettlementFeed } from './components/LiveSettlementFeed';
 import { Logo } from './components/Logo';
 import { SystemTransition } from './components/SystemTransition';
 
@@ -132,6 +133,14 @@ export function App() {
         <div className="w-full max-w-6xl mx-auto px-5 sm:px-6">
           {/* About Section */}
           <AboutSection />
+
+          {/* Live On-Chain Settlement Feed */}
+          <section id="settlements" className="scroll-mt-20 my-8">
+            <LiveSettlementFeed
+              onOpenPaystub={handleOpenPaystub}
+              onLaunchApp={navigateToApp}
+            />
+          </section>
 
           {/* Guided 4-Step Process & Cryptographic Lifecycle */}
           <section id="how-it-works" className="py-20 scroll-mt-20">

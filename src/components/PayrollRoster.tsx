@@ -24,6 +24,7 @@ import {
   isValidPreprodAddress, 
   FAUCET_URL 
 } from '../utils/teamRoster';
+import { saveSettlementRecord } from '../utils/settlementFeed';
 import { WalletState } from '../hooks/useMidnight';
 
 interface Props {
@@ -140,11 +141,25 @@ export const PayrollRoster: React.FC<Props> = ({
         res && typeof res === 'object' && res.explorerUrl
           ? res.explorerUrl
           : `https://preprod.midnightexplorer.com/transactions/${finalTx.startsWith('0x') ? finalTx : `0x${finalTx}`}`;
+      const nowStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      saveSettlementRecord({
+        id: `set-${Date.now()}`,
+        txHash: finalTx,
+        blockTimestamp: `Just now (${nowStr})`,
+        circuitName: 'processPayrollBatch (Compact v0.31.1)',
+        recipientCount: employees.length,
+        totalDisbursed: total,
+        merkleBatchRoot: root,
+        status: 'Confirmed',
+        explorerUrl: finalExplorerUrl,
+        network: 'Midnight Preprod',
+        organizationId: 'ORG-VANSIDIAN-ACTIVE',
+      });
       onOpenPaystub({
         certificateId: `CERT-${Math.floor(100000 + Math.random() * 900000)}`,
         txHash: finalTx,
         explorerUrl: finalExplorerUrl,
-        blockTimestamp: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        blockTimestamp: nowStr,
         employeeName: 'Vansidian Enterprise Team',
         employeeRole: 'September payroll run',
         disclosedAmount: total,

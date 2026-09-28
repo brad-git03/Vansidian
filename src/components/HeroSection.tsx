@@ -11,8 +11,13 @@ export const HeroSection:React.FC<HeroSectionProps>=({onConnectClick,isConnected
    <div className="max-w-2xl"><div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[.05] px-3 py-1.5 text-xs text-[#c7bcff]"><ShieldCheck className="h-3.5 w-3.5"/>Private finance, publicly verifiable</div>
     <h1 className="text-5xl font-medium leading-[1.02] tracking-[-.055em] text-white sm:text-6xl lg:text-[76px]">Payroll privacy<br/><span className="bg-gradient-to-r from-[#b7a8ff] via-[#8f78ff] to-[#63d6a4] bg-clip-text text-transparent">starts here.</span></h1>
     <p className="mt-6 max-w-lg text-sm leading-6 text-[var(--text-muted)] sm:text-base">Run confidential payroll, prove every disbursement, and give auditors exactly what they need—without exposing employee compensation.</p>
-    <div className="mt-8 flex flex-col gap-3 sm:flex-row"><button onClick={onLaunchApp} className="app-button-primary flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold">Start a payroll run <ArrowRight className="h-4 w-4"/></button><a href="#how-it-works" className="app-button-secondary flex items-center justify-center rounded-full px-6 py-3 font-semibold">See how it works</a></div>
-    {!isConnected&&<button onClick={onConnectClick} disabled={isConnecting} className="mt-4 text-xs text-[var(--text-muted)] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">{isConnecting ? 'Waiting for Lace authorization…' : 'Connect a Lace wallet instead →'}</button>}
+    <div className="mt-8 flex flex-col gap-3 sm:flex-row"><button onClick={onLaunchApp} className="app-button-primary flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold">Start a payroll run <ArrowRight className="h-4 w-4"/></button><a href="#settlements" className="app-button-secondary flex items-center justify-center rounded-full px-6 py-3 font-semibold">Live Settlements Feed ↓</a></div>
+    <div className="mt-4 flex items-center gap-2 text-xs text-[var(--text-muted)] flex-wrap">
+      <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span>Live on Midnight Preprod · ZK-SNARK Verified ·</span>
+      <a href="#settlements" className="text-[#a995ff] hover:underline font-medium">Inspect On-Chain Proofs →</a>
+    </div>
+    {!isConnected&&<button onClick={onConnectClick} disabled={isConnecting} className="mt-2 text-xs text-[var(--text-muted)] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity block">{isConnecting ? 'Waiting for Lace authorization…' : 'Connect a Lace wallet instead →'}</button>}
    </div>
    <div className="relative mx-auto w-full max-w-[620px] pb-10" aria-label="Vansidian workspace preview">
     <div className="absolute -inset-8 rounded-full bg-[#7657f6]/10 blur-3xl"/>
