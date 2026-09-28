@@ -73,7 +73,7 @@ export class Contract {
     }
     this.witnesses = witnesses_0;
     this.circuits = {
-      processPayrollBatch: async (...args_1) => {
+      processPayrollBatch: (...args_1) => {
         if (args_1.length !== 5) {
           throw new __compactRuntime.CompactError(`processPayrollBatch: expected 5 arguments (as invoked from Typescript), received ${args_1.length}`);
         }
@@ -117,7 +117,7 @@ export class Contract {
                                      'Uint<0..65536>',
                                      employeeCount_0)
         }
-        const context = { ...contextOrig_0 };
+        const context = { ...contextOrig_0, gasCost: __compactRuntime.emptyRunningCost() };
         const partialProofData = {
           input: {
             value: _descriptor_1.toValue(orgId_0).concat(_descriptor_1.toValue(newBatchRoot_0).concat(_descriptor_0.toValue(batchTotalAmount_0).concat(_descriptor_0.toValue(employeeCount_0)))),
@@ -127,16 +127,16 @@ export class Contract {
           publicTranscript: [],
           privateTranscriptOutputs: []
         };
-        const result_0 = await this._processPayrollBatch_0(context,
+        const result_0 = this._processPayrollBatch_0(context,
                                                            partialProofData,
                                                            orgId_0,
                                                            newBatchRoot_0,
                                                            batchTotalAmount_0,
                                                            employeeCount_0);
         partialProofData.output = { value: [], alignment: [] };
-        return { result: result_0, context: context, gasCost: context.gasCost };
+        return { result: result_0, context: context, proofData: partialProofData, gasCost: context.gasCost };
       },
-      increment: async (...args_1) => {
+      increment: (...args_1) => {
         if (args_1.length !== 2) {
           throw new __compactRuntime.CompactError(`increment: expected 2 arguments (as invoked from Typescript), received ${args_1.length}`);
         }
@@ -156,7 +156,7 @@ export class Contract {
                                      'Uint<0..65536>',
                                      val_0)
         }
-        const context = { ...contextOrig_0 };
+        const context = { ...contextOrig_0, gasCost: __compactRuntime.emptyRunningCost() };
         const partialProofData = {
           input: {
             value: _descriptor_0.toValue(val_0),
@@ -166,11 +166,11 @@ export class Contract {
           publicTranscript: [],
           privateTranscriptOutputs: []
         };
-        const result_0 = await this._increment_0(context,
+        const result_0 = this._increment_0(context,
                                                  partialProofData,
                                                  val_0);
         partialProofData.output = { value: [], alignment: [] };
-        return { result: result_0, context: context, gasCost: context.gasCost };
+        return { result: result_0, context: context, proofData: partialProofData, gasCost: context.gasCost };
       }
     };
     this.impureCircuits = {
@@ -331,7 +331,7 @@ export class Contract {
     });
     return result_0;
   }
-  async _processPayrollBatch_0(context,
+  _processPayrollBatch_0(context,
                                partialProofData,
                                orgId_0,
                                newBatchRoot_0,
@@ -402,7 +402,7 @@ export class Contract {
                                        { ins: { cached: true, n: 1 } }]);
     return [];
   }
-  async _increment_0(context, partialProofData, val_0) {
+  _increment_0(context, partialProofData, val_0) {
     const secretAmount_0 = this._secretSalaryAmount_0(context, partialProofData);
     __compactRuntime.assert(secretAmount_0 === val_0,
                             'Witness mismatch: secret amount does not match transaction increment');

@@ -532,7 +532,8 @@ export function useMidnight() {
           }
           txHashResult = balanced?.txHash || (typeof balanced === 'string' ? balanced : '');
           const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
-          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
+          const formattedTx = txHashResult.startsWith('0x') ? txHashResult : `0x${txHashResult}`;
+          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/transactions/${formattedTx}`;
         }
         // Optional fallback: Explicit direct token transfer if requested by user
         else if (options?.isDirectTransfer && typeof api.makeTransfer === 'function') {
@@ -551,7 +552,8 @@ export function useMidnight() {
           }
           txHashResult = transferRes?.txHash || '';
           const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
-          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
+          const formattedTransferTx = txHashResult.startsWith('0x') ? txHashResult : `0x${txHashResult}`;
+          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/transactions/${formattedTransferTx}`;
         } else {
           throw new Error('Lace Wallet does not support transaction authorization or contract signing.');
         }
