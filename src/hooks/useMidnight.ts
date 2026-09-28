@@ -239,8 +239,12 @@ export function useMidnight() {
           } else if (typeof addrRes === 'string') {
             address = addrRes;
           }
-        } catch (e) {
+        } catch (e: any) {
           console.warn('[Lace] getUnshieldedAddress error:', e);
+          const eMsg = (e?.message || e?.reason || String(e)).toLowerCase();
+          if (eMsg.includes('locked')) {
+            throw new Error('Midnight Lace extension is locked. Please unlock the extension with your password and reconnect.');
+          }
         }
       }
 
@@ -305,8 +309,17 @@ export function useMidnight() {
           typeof api.getDustBalance === 'function' ? api.getDustBalance() : Promise.resolve(null),
           !shieldedAddress && typeof api.getShieldedAddresses === 'function' ? api.getShieldedAddresses() : Promise.resolve(null),
         ]);
-        if (dustRes.status === 'fulfilled' && dustRes.value?.balance !== undefined) {
-          dustBalance = dustRes.value.balance.toString();
+        if (dustRes.status === 'fulfilled' && dustRes.value !== undefined && dustRes.value !== null) {
+          const v = dustRes.value;
+          if (typeof v === 'bigint' || typeof v === 'number') {
+            dustBalance = v.toString();
+          } else if (typeof v === 'object') {
+            if (v.balance !== undefined) dustBalance = v.balance.toString();
+            else if (v.value !== undefined) dustBalance = v.value.toString();
+            else if (v.amount !== undefined) dustBalance = v.amount.toString();
+          } else if (typeof v === 'string') {
+            dustBalance = v;
+          }
         }
         if (shieldRes.status === 'fulfilled' && shieldRes.value) {
           const val = shieldRes.value;
