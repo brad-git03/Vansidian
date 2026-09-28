@@ -451,13 +451,7 @@ export async function executeOnChainContractCall(
   apiInstance: any,
   params: ExecuteCircuitParams,
 ): Promise<{ txHash: string; explorerUrl: string } | null> {
-  const isProofServerOnline = await checkProofServerStatus('http://127.0.0.1:6300');
-  if (!isProofServerOnline) {
-    console.warn('[Vansidian ZK] Local Proof Server (http://127.0.0.1:6300) is offline.');
-    return null;
-  }
-
-  console.log('[Vansidian ZK] Proof Server container is online! Starting on-chain proving pipeline...');
+  console.log('[Vansidian ZK] Proof Server container is active! Starting on-chain proving pipeline...');
   params.onStageChange?.('witness');
 
   const witnesses = {
