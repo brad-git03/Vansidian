@@ -72,8 +72,9 @@ jobs:
         run: |
           grep -q "isConnectingRef" src/hooks/useMidnight.ts || { echo "Missing isConnectingRef concurrency lock in useMidnight.ts"; exit 1; }
           grep -q "RemoteApiShutdownError" src/hooks/useMidnight.ts || { echo "Missing RemoteApiShutdownError handling in useMidnight.ts"; exit 1; }
+          grep -q "signData" src/hooks/useMidnight.ts || { echo "Missing signData authorization in useMidnight.ts"; exit 1; }
           grep -q "isConnecting" src/components/HeroSection.tsx || { echo "Missing isConnecting guard in HeroSection.tsx"; exit 1; }
-          echo "Midnight DApp Connector concurrency locks and shutdown error safeguards verified."
+          echo "Midnight DApp Connector concurrency locks, signData authorization, and shutdown error safeguards verified."
 
       - name: Build Vite Production Bundle
         run: npm run build

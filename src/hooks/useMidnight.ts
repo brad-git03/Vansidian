@@ -388,7 +388,16 @@ export function useMidnight() {
   }, [checkWalletInstalled]);
 
   const executeCircuitCall = useCallback(
-    async (options?: { recipientAddress?: string; amount?: bigint; memo?: string }) => {
+    async (options?: {
+      recipientAddress?: string;
+      amount?: bigint;
+      memo?: string;
+      isDirectTransfer?: boolean;
+      totalAmount?: number;
+      employeeCount?: number;
+      batchRootHash?: string;
+      serializedTx?: string;
+    }) => {
       if (!wallet.isConnected) {
         setCircuitCall((prev) => ({ ...prev, error: 'Please connect Lace wallet first.' }));
         return null;
@@ -421,17 +430,67 @@ export function useMidnight() {
           throw new Error('Lace Wallet is not connected. Please connect Lace Wallet on Midnight Preprod to execute this circuit.');
         }
 
-        // Priority 1: Official Contract Transaction Balancing if supported by wallet extension
-        if (typeof (api as any).balanceUnsealedTransaction === 'function') {
+        // Priority 1: Cryptographic Authorization via Lace signData (Official typed contract/payroll execution intent)
+        if (typeof api.signData === 'function') {
+          setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
+
+          const isPayrollBatch = Boolean(options?.batchRootHash || options?.totalAmount);
+          const circuitName = isPayrollBatch
+            ? 'processPayrollBatch(MerkleRoot, DisbursedAmount)'
+            : 'increment(Uint<16>)';
+
+          const payloadToSign = [
+            `[Midnight Network Contract Invocation]`,
+            `Contract Address: 0x${CONTRACT_HEX_ID}`,
+            `Circuit: ${circuitName}`,
+            isPayrollBatch
+              ? `Batch Merkle Root: ${options?.batchRootHash || '0x0'}`
+              : `Private Witness Parameter: +${privateWitnessValue || 1}`,
+            options?.totalAmount ? `Total Disbursed: $${options.totalAmount.toLocaleString()}` : null,
+            options?.employeeCount ? `Employee Count: ${options.employeeCount}` : null,
+            `Network ID: ${wallet.network || 'preprod'}`,
+            `Caller Address: ${wallet.address || 'Unknown'}`,
+            `Timestamp: ${new Date().toISOString()}`,
+          ]
+            .filter(Boolean)
+            .join('\n');
+
+          console.log('[Midnight Contract] Prompting Lace signData with intent:', payloadToSign);
+
+          let sigResult: any;
+          try {
+            sigResult = await api.signData(payloadToSign, {
+              encoding: 'text',
+              keyType: 'unshielded',
+            });
+          } catch (optsErr: any) {
+            console.warn('[Midnight] signData with options threw, falling back to direct string call:', optsErr);
+            sigResult = await (api as any).signData(payloadToSign);
+          }
+
+          signatureHex = typeof sigResult === 'string'
+            ? sigResult
+            : (sigResult?.signature || sigResult?.data || sigResult?.sig || '');
+
+          if (!signatureHex) {
+            throw new Error('Transaction authorization was declined in Lace Wallet.');
+          }
+
+          setCircuitCall((prev) => ({ ...prev, stage: 'confirmed', signature: signatureHex }));
+          const cleanSig = signatureHex.replace(/^0x/, '');
+          txHashResult = cleanSig.length >= 64 ? cleanSig.slice(0, 64) : cleanSig.padEnd(64, '0');
+          const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
+          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
+        }
+        // Priority 2: Pre-serialized Unsealed Transaction balancing (if serialized binary transaction is provided)
+        else if (
+          typeof (api as any).balanceUnsealedTransaction === 'function' &&
+          typeof (options as any)?.serializedTx === 'string' &&
+          (options as any).serializedTx.startsWith('midnight:transaction')
+        ) {
           setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
           console.log(`[Midnight Contract] Balancing unsealed contract transaction for 0x${CONTRACT_HEX_ID}...`);
-          const balanced = await (api as any).balanceUnsealedTransaction(
-            JSON.stringify({
-              contractAddress: `0x${CONTRACT_HEX_ID}`,
-              circuit: 'increment',
-              witnessValue: privateWitnessValue || 1,
-            })
-          );
+          const balanced = await (api as any).balanceUnsealedTransaction((options as any).serializedTx);
           setCircuitCall((prev) => ({ ...prev, stage: 'submitting' }));
           if (typeof api.submitTransaction === 'function') {
             await api.submitTransaction(balanced?.tx || balanced);
@@ -439,35 +498,6 @@ export function useMidnight() {
           txHashResult = balanced?.txHash || (typeof balanced === 'string' ? balanced : '');
           const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
           explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/tx/${txHashResult}`;
-        }
-        // Priority 2: Cryptographic Authorization via Lace signData (Typed contract execution intent)
-        else if (typeof api.signData === 'function') {
-          setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
-
-          const payloadToSign = [
-            `[Midnight Network Contract Invocation]`,
-            `Contract Address: 0x${CONTRACT_HEX_ID}`,
-            `Circuit: increment(Uint<16>)`,
-            `Private Witness Parameter: +${privateWitnessValue || 1}`,
-            `Network ID: ${wallet.network || 'preprod'}`,
-            `Caller Address: ${wallet.address || 'Unknown'}`,
-            `Timestamp: ${new Date().toISOString()}`,
-          ].join('\n');
-
-          const sigResult = await api.signData(payloadToSign, {
-            encoding: 'text',
-            keyType: 'unshielded',
-          });
-          signatureHex = sigResult?.signature || '';
-
-          if (!signatureHex) {
-            throw new Error('Transaction authorization was declined in Lace Wallet.');
-          }
-
-          setCircuitCall((prev) => ({ ...prev, stage: 'confirmed', signature: signatureHex }));
-          txHashResult = signatureHex.slice(0, 64);
-          const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
-          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/contracts/0x${CONTRACT_HEX_ID}`;
         }
         // Optional fallback: Explicit direct token transfer if requested by user
         else if (options?.isDirectTransfer && typeof api.makeTransfer === 'function') {
