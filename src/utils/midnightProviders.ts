@@ -455,14 +455,14 @@ export async function executeOnChainContractCall(
   params.onStageChange?.('witness');
 
   const witnesses = {
-    secretSalaryAmount: (context: any) => [context.privateState, BigInt(params.totalAmount || 1000)],
+    secretSalaryAmount: (context: any) => [context.privateState, BigInt(params.witnessValue ?? (params.totalAmount ?? 1000))],
     secretBatchHash: (context: any) => {
       const rootHex = (params.batchRootHash || '').replace(/^0x/, '').padEnd(64, '0').slice(0, 64);
       const bytes = new Uint8Array(rootHex.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)));
       return [context.privateState, bytes];
     },
-    secretBatchTotalAmount: (context: any) => [context.privateState, BigInt(params.totalAmount || 1000)],
-    secretEmployeeCount: (context: any) => [context.privateState, BigInt(params.employeeCount || 5)],
+    secretBatchTotalAmount: (context: any) => [context.privateState, BigInt(params.totalAmount ?? 34500)],
+    secretEmployeeCount: (context: any) => [context.privateState, BigInt(params.employeeCount ?? 5)],
   };
 
   const compiledContract = CompiledContract.make('vansidian', VansidianContract).pipe(
@@ -489,8 +489,8 @@ export async function executeOnChainContractCall(
     orgIdBytes[31] = 1;
     const rootHex = (params.batchRootHash || '').replace(/^0x/, '').padEnd(64, '0').slice(0, 64);
     const rootBytes = new Uint8Array(rootHex.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)));
-    const totalDisbursed = BigInt(params.totalAmount || 34500);
-    const employeeCount = BigInt(params.employeeCount || 5);
+    const totalDisbursed = BigInt(params.totalAmount ?? 34500);
+    const employeeCount = BigInt(params.employeeCount ?? 5);
     callResult = await (deployed.callTx as any).processPayrollBatch(orgIdBytes, rootBytes, totalDisbursed, employeeCount);
   } else if ((deployed?.callTx as any)?.increment) {
     const incVal = BigInt(params.witnessValue || 1);

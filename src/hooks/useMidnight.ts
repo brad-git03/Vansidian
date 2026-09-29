@@ -466,70 +466,10 @@ export function useMidnight() {
             setCircuitCall((prev) => ({ ...prev, stage: 'confirmed', txHash: txHashResult }));
           }
         } catch (onChainError: any) {
-          console.warn('[Midnight Engine] On-chain proving encounter notice:', onChainError);
-          const errStr = (onChainError?.message || String(onChainError)).toLowerCase();
-          if (
-            errStr.includes('reject') ||
-            errStr.includes('denied') ||
-            errStr.includes('cancel') ||
-            errStr.includes('declined')
-          ) {
-            throw onChainError;
-          }
+          console.error('[Midnight Engine] On-chain proving encounter error:', onChainError);
+          throw onChainError;
         }
 
-        // Priority 2: Fallback to Cryptographic Authorization via Lace signData (if proof server offline)
-        if (!onChainSuccess && typeof api.signData === 'function') {
-          setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
-
-          const isPayrollBatch = Boolean(options?.batchRootHash || options?.totalAmount);
-          const circuitName = isPayrollBatch
-            ? 'processPayrollBatch(MerkleRoot, DisbursedAmount)'
-            : 'increment(Uint<16>)';
-
-          const payloadToSign = [
-            `[Midnight Network Contract Invocation]`,
-            `Contract Address: 0x${CONTRACT_HEX_ID}`,
-            `Circuit: ${circuitName}`,
-            isPayrollBatch
-              ? `Batch Merkle Root: ${options?.batchRootHash || '0x0'}`
-              : `Private Witness Parameter: +${privateWitnessValue || 1}`,
-            options?.totalAmount ? `Total Disbursed: $${options.totalAmount.toLocaleString()}` : null,
-            options?.employeeCount ? `Employee Count: ${options.employeeCount}` : null,
-            `Network ID: ${wallet.network || 'preprod'}`,
-            `Caller Address: ${wallet.address || 'Unknown'}`,
-            `Timestamp: ${new Date().toISOString()}`,
-          ]
-            .filter(Boolean)
-            .join('\n');
-
-          console.log('[Midnight Contract] Prompting Lace signData with intent:', payloadToSign);
-
-          let sigResult: any;
-          try {
-            sigResult = await api.signData(payloadToSign, {
-              encoding: 'text',
-              keyType: 'unshielded',
-            });
-          } catch (optsErr: any) {
-            console.warn('[Midnight] signData with options threw, falling back to direct string call:', optsErr);
-            sigResult = await (api as any).signData(payloadToSign);
-          }
-
-          signatureHex = typeof sigResult === 'string'
-            ? sigResult
-            : (sigResult?.signature || sigResult?.data || sigResult?.sig || '');
-
-          if (!signatureHex) {
-            throw new Error('Transaction authorization was declined in Lace Wallet.');
-          }
-
-          setCircuitCall((prev) => ({ ...prev, stage: 'confirmed', signature: signatureHex }));
-          const cleanSig = signatureHex.replace(/^0x/, '');
-          txHashResult = cleanSig.length >= 64 ? cleanSig.slice(0, 64) : cleanSig.padEnd(64, '0');
-          const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
-          explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/contracts/0x${CONTRACT_HEX_ID}`;
-        }
         // Priority 2: Pre-serialized Unsealed Transaction balancing (if serialized binary transaction is provided)
         else if (
           typeof (api as any).balanceUnsealedTransaction === 'function' &&
