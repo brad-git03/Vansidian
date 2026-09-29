@@ -3,9 +3,10 @@ import React from 'react';
 interface LogoProps {
   size?: number;
   showText?: boolean;
+  showTagline?: boolean;
 }
 
-export const Logo: React.FC<LogoProps> = ({ size = 36, showText = true }) => {
+export const Logo: React.FC<LogoProps> = ({ size = 36, showText = true, showTagline = true }) => {
   return (
     <div className="flex items-center gap-2.5 group cursor-pointer select-none">
       {/* Faceted Shield Emblem Container */}
@@ -27,12 +28,10 @@ export const Logo: React.FC<LogoProps> = ({ size = 36, showText = true }) => {
 
       {showText && (
         <div className="flex flex-col text-left">
-          <span className="font-semibold text-white tracking-tight text-base flex items-center font-sans leading-none">
+          <span className={`${showTagline ? 'text-base font-semibold tracking-tight' : 'text-xl font-bold tracking-[-.025em]'} flex items-center font-sans leading-none text-white`}>
             Vansidian
           </span>
-          <span className="text-[11px] text-[var(--text-muted)] mt-1">
-            Private payroll
-          </span>
+          {showTagline && <span className="mt-1 text-[11px] text-[var(--text-muted)]">Private payroll</span>}
         </div>
       )}
     </div>

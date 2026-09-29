@@ -176,9 +176,9 @@ export const PayrollRoster: React.FC<Props> = ({
   const isPreprodNetwork = wallet?.network === 'preprod';
 
   return (
-    <section className="app-card overflow-hidden space-y-0" aria-labelledby="payroll-title">
+    <section className="payroll-workspace overflow-hidden space-y-0" aria-labelledby="payroll-title">
       {/* Top Readiness & Gas Banner for Employer */}
-      <div className="bg-[var(--surface-1)] border-b border-[var(--border)] px-5 py-3 sm:px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
+      <div className="border-b border-[var(--border)] bg-[#0a152b]/80 px-5 py-3 sm:px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-semibold text-white flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-[#a995ff]" />
@@ -213,10 +213,10 @@ export const PayrollRoster: React.FC<Props> = ({
       </div>
 
       {/* Main Header */}
-      <div className="flex flex-col gap-5 border-b border-[var(--border)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <div className="flex flex-col gap-5 border-b border-[var(--border)] bg-[linear-gradient(135deg,rgba(19,31,58,.9),rgba(12,23,44,.9))] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
         <div>
           <div className="flex items-center gap-2">
-            <h2 id="payroll-title" className="text-lg font-semibold text-white">September payroll</h2>
+            <h2 id="payroll-title" className="text-xl font-semibold tracking-[-0.02em] text-white">September payroll</h2>
             <span className="status-success rounded-full px-2 py-0.5 text-xs">Ready for Settlement</span>
           </div>
           <p className="mt-1 text-sm text-[var(--text-muted)]">
@@ -244,22 +244,22 @@ export const PayrollRoster: React.FC<Props> = ({
       </div>
 
       {/* Stats Ribbon */}
-      <div className="grid grid-cols-2 border-b border-[var(--border)] bg-[var(--canvas)] sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-px border-b border-[var(--border)] bg-[var(--border)] sm:grid-cols-4">
         {[
           ['Total payroll', `$${total.toLocaleString()}`],
           ['Team members', String(employees.length)],
           ['Pay date', 'Sep 30'],
           ['Settlement Invariant', 'O(1) Compact Batch'],
         ].map(([k, v]) => (
-          <div key={k} className="border-b border-r border-[var(--border)] p-4 sm:border-b-0 sm:p-5">
-            <p className="text-xs text-[var(--text-muted)]">{k}</p>
-            <p className="mt-1 text-lg font-semibold">{v}</p>
+          <div key={k} className="bg-[#0b162c] p-4 sm:p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-subtle)]">{k}</p>
+            <p className="mt-2 text-lg font-semibold tracking-tight">{v}</p>
           </div>
         ))}
       </div>
 
       {/* Search and Action Bar */}
-      <div className="flex flex-col gap-3 border-b border-[var(--border)] p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-b border-[var(--border)] bg-[#0d1830]/70 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <label className="relative block sm:w-80">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-subtle)]" />
           <span className="sr-only">Search team members or addresses</span>
@@ -267,7 +267,7 @@ export const PayrollRoster: React.FC<Props> = ({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search team member or Preprod address..."
-            className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-1)] py-2 pl-9 pr-3 text-xs placeholder:text-[var(--text-subtle)] text-white"
+            className="w-full rounded-xl border border-[var(--border)] bg-[#071024] py-2.5 pl-9 pr-3 text-xs placeholder:text-[var(--text-subtle)] text-white transition-colors focus:border-[#765eff]"
           />
         </label>
         <div className="flex items-center gap-3">
@@ -383,7 +383,7 @@ export const PayrollRoster: React.FC<Props> = ({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[850px] text-left">
           <thead>
-            <tr className="border-b border-[var(--border)] text-xs text-[var(--text-muted)]">
+            <tr className="border-b border-[var(--border)] bg-[#091328] text-[10px] uppercase tracking-[0.12em] text-[var(--text-subtle)]">
               <th className="px-6 py-3 font-medium">Team member</th>
               <th className="px-4 py-3 font-medium">Midnight Preprod Address</th>
               <th className="px-4 py-3 font-medium">Department</th>
@@ -395,10 +395,17 @@ export const PayrollRoster: React.FC<Props> = ({
           </thead>
           <tbody>
             {shown.map((e) => (
-              <tr key={e.id} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-3)]">
+              <tr key={e.id} className="border-b border-[var(--border)] bg-[#0c172e]/80 last:border-0 transition-colors hover:bg-[#14213d]">
                 <td className="px-6 py-3.5">
-                  <p className="font-medium text-white">{e.name}</p>
-                  <p className="text-xs text-[var(--text-muted)]">{e.role}</p>
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#765eff]/20 bg-[#765eff]/10 text-[10px] font-semibold text-[#b7a8ff]">
+                      {e.name.split(' ').map((part) => part[0]).join('').slice(0, 2)}
+                    </span>
+                    <div>
+                      <p className="font-medium text-white">{e.name}</p>
+                      <p className="text-xs text-[var(--text-muted)]">{e.role}</p>
+                    </div>
+                  </div>
                 </td>
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-1.5">

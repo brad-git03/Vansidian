@@ -189,6 +189,24 @@ export circuit processPayrollBatch(
             </div>
           )}
         </div>
+
+        <div className="grid gap-4 md:grid-cols-3" aria-label="Proof disclosure model">
+          <article className="rounded-xl border border-[#484080] bg-[#171735] p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-[#a995ff]">Private inputs</p>
+            <h3 className="mt-3 font-semibold text-white">Known only to authorized users</h3>
+            <p className="mt-3 text-sm leading-6 text-slate-400">Employee identities, individual compensation, bonuses, recipient information, and private witness material.</p>
+          </article>
+          <article className="rounded-xl border border-[#275b66] bg-[#102635] p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-[#55d9ea]">Proven constraints</p>
+            <h3 className="mt-3 font-semibold text-white">Verified without disclosure</h3>
+            <p className="mt-3 text-sm leading-6 text-slate-400">The batch commitment, employee-count bounds, payroll totals, and Compact contract invariants must all hold.</p>
+          </article>
+          <article className="rounded-xl border border-[#45622e] bg-[#17291e] p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-[#b4ea61]">Public output</p>
+            <h3 className="mt-3 font-semibold text-white">Durable verification evidence</h3>
+            <p className="mt-3 text-sm leading-6 text-slate-400">A batch commitment, accepted state transition, transaction hash, public counters, and audit reference.</p>
+          </article>
+        </div>
       </div>
     </section>
   );

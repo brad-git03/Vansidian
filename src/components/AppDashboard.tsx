@@ -97,19 +97,20 @@ export const AppDashboard: React.FC<Props> = ({
 
   const Sidebar = () => (
     <>
-      <div className="flex h-16 items-center border-b border-[var(--border)] px-5">
-        <Logo size={30} showText />
+      <div className="flex h-[76px] items-center justify-between border-b border-[var(--border)] px-5">
+        <Logo size={32} showText />
+        <span className="rounded-full border border-[#765eff]/30 bg-[#765eff]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#b7a8ff]">Preprod</span>
       </div>
 
       {/* Role Selector in Sidebar */}
-      <div className="p-3 border-b border-[var(--border)] bg-[var(--surface-1)]">
+      <div className="border-b border-[var(--border)] bg-[#091329] p-4">
         <label className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] block mb-2 px-1">
           Active Workspace Role
         </label>
         <div className="grid grid-cols-1 gap-1">
           <button
             onClick={() => handleRoleChange('employer')}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left cursor-pointer ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-left cursor-pointer ${
               role === 'employer'
                 ? 'bg-[var(--brand-soft)] text-white border border-[#a995ff]/40 shadow-sm'
                 : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-white'
@@ -124,7 +125,7 @@ export const AppDashboard: React.FC<Props> = ({
 
           <button
             onClick={() => handleRoleChange('auditor')}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left cursor-pointer ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-left cursor-pointer ${
               role === 'auditor'
                 ? 'bg-emerald-500/20 text-white border border-emerald-500/40 shadow-sm'
                 : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-white'
@@ -139,7 +140,7 @@ export const AppDashboard: React.FC<Props> = ({
 
           <button
             onClick={() => handleRoleChange('employee')}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left cursor-pointer ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-left cursor-pointer ${
               role === 'employee'
                 ? 'bg-indigo-500/20 text-white border border-indigo-500/40 shadow-sm'
                 : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-white'
@@ -155,7 +156,7 @@ export const AppDashboard: React.FC<Props> = ({
       </div>
 
       {/* Role Navigation Items */}
-      <nav className="flex-1 space-y-1 p-3 overflow-y-auto" aria-label="Workspace navigation">
+      <nav className="flex-1 space-y-1 overflow-y-auto p-4" aria-label="Workspace navigation">
         {role === 'employer' && (
           <>
             <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] px-3 pt-1 pb-2">
@@ -165,9 +166,9 @@ export const AppDashboard: React.FC<Props> = ({
               <button
                 key={id}
                 onClick={() => chooseView(id)}
-                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors cursor-pointer ${
+                className={`group relative flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm transition-colors cursor-pointer ${
                   view === id
-                    ? 'bg-[var(--brand-soft)] text-white font-medium'
+                    ? 'bg-[linear-gradient(90deg,rgba(103,76,244,.22),rgba(103,76,244,.08))] text-white font-medium ring-1 ring-inset ring-[#8069ff]/20'
                     : 'text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-white'
                 }`}
                 aria-current={view === id ? 'page' : undefined}
@@ -212,20 +213,26 @@ export const AppDashboard: React.FC<Props> = ({
         )}
       </nav>
 
-      <button
-        onClick={onBackToWebsite}
-        className="m-3 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--text-muted)] hover:text-white cursor-pointer"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to website
-      </button>
+      <div className="m-4 space-y-3">
+        <div className="rounded-xl border border-emerald-400/15 bg-emerald-400/[.05] p-3">
+          <p className="flex items-center gap-2 text-[11px] font-medium text-emerald-300"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />Midnight network online</p>
+          <p className="mt-1 pl-3.5 text-[10px] text-[var(--text-subtle)]">Proof services operational</p>
+        </div>
+        <button
+          onClick={onBackToWebsite}
+          className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-[var(--text-muted)] hover:text-white cursor-pointer"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to website
+        </button>
+      </div>
     </>
   );
 
   return (
-    <div className="min-h-screen bg-[var(--canvas)] text-white lg:grid lg:grid-cols-[240px_1fr]">
+    <div className="app-dashboard-shell min-h-screen bg-[var(--canvas)] text-white lg:grid lg:grid-cols-[268px_1fr]">
       {/* Desktop Sidebar */}
-      <aside className="sticky top-0 hidden h-screen border-r border-[var(--border)] bg-[var(--surface-1)] lg:flex lg:flex-col">
+      <aside className="sticky top-0 hidden h-screen border-r border-[var(--border)] bg-[#081126]/95 lg:flex lg:flex-col">
         <Sidebar />
       </aside>
 
@@ -253,7 +260,7 @@ export const AppDashboard: React.FC<Props> = ({
       {/* Main Container */}
       <div className="min-w-0 flex flex-col">
         {/* Workspace Top Header */}
-        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[color:var(--canvas)]/95 px-4 backdrop-blur-md sm:px-6">
+        <header className="sticky top-0 z-40 flex h-[76px] items-center justify-between border-b border-[var(--border)] bg-[#071024]/90 px-4 backdrop-blur-xl sm:px-7">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobile(true)}
@@ -336,16 +343,16 @@ export const AppDashboard: React.FC<Props> = ({
         </header>
 
         {/* Main Content Area */}
-        <main className="mx-auto max-w-7xl w-full p-4 sm:p-6 lg:p-8 flex-1">
+        <main className="relative mx-auto w-full max-w-[1480px] flex-1 p-4 sm:p-7 lg:p-10">
           {/* Subheader / Role Context Banner */}
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-wider font-semibold text-[#a995ff]">
                 {role === 'employer' && 'Finance Operations & Treasury Engine'}
                 {role === 'auditor' && 'Compliance & Zero-Knowledge Verification'}
                 {role === 'employee' && 'Employee Self-Service & Private Records'}
               </p>
-              <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
+              <h1 className="mt-1.5 text-3xl font-semibold tracking-[-0.03em] sm:text-[34px]">
                 {role === 'employer' && (employerNav.find((n) => n[0] === view)?.[1] || 'Payroll')}
                 {role === 'auditor' && 'Auditor & Compliance Suite'}
                 {role === 'employee' && 'Personal Paystub & Income Statement'}

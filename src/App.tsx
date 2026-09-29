@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { useMidnight } from './hooks/useMidnight';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
@@ -13,6 +13,15 @@ import { PaystubModal, PaystubData } from './components/PaystubModal';
 import { LiveSettlementFeed } from './components/LiveSettlementFeed';
 import { Logo } from './components/Logo';
 import { SystemTransition } from './components/SystemTransition';
+import { PayrollProblemSection } from './components/PayrollProblemSection';
+import { PayrollFlowComparison } from './components/PayrollFlowComparison';
+import { ProductScope } from './components/ProductScope';
+import { FAQSection } from './components/FAQSection';
+import { LandingCTA } from './components/LandingCTA';
+
+const PayrollArchitectureFlow = lazy(() =>
+  import('./components/PayrollArchitectureFlow').then((module) => ({ default: module.PayrollArchitectureFlow })),
+);
 
 export function App() {
   const {
@@ -130,24 +139,38 @@ export function App() {
         />
 
         {/* 2. Main Sections Container */}
-        <div className="w-full max-w-6xl mx-auto px-5 sm:px-6">
+        <div className="mx-auto w-full max-w-[1324px] px-5 sm:px-7">
           {/* About Section */}
           <AboutSection />
+
+          {/* Why private payroll needs a different architecture */}
+          <PayrollProblemSection />
+
+          {/* Traditional payroll compared with the Vansidian privacy model */}
+          <PayrollFlowComparison />
+
+          {/* Guided 4-Step Process & Cryptographic Lifecycle */}
+          <section id="how-it-works" className="scroll-mt-20 py-20">
+            <WorkflowBar
+              isConnected={wallet.isConnected}
+              hasWitnessValue={Boolean(privateWitnessValue)}
+              isConfirmed={circuitCall.stage === 'confirmed'}
+            />
+          </section>
+
+          {/* Read-only animated view of the proof and settlement architecture */}
+          <Suspense fallback={<div className="my-12 h-[620px] animate-pulse rounded-2xl border border-[var(--border)] bg-[var(--surface-1)]" aria-label="Loading interactive architecture" />}>
+            <PayrollArchitectureFlow
+              stage={circuitCall.stage}
+              isConnected={wallet.isConnected}
+            />
+          </Suspense>
 
           {/* Live On-Chain Settlement Feed */}
           <section id="settlements" className="scroll-mt-20 my-8">
             <LiveSettlementFeed
               onOpenPaystub={handleOpenPaystub}
               onLaunchApp={navigateToApp}
-            />
-          </section>
-
-          {/* Guided 4-Step Process & Cryptographic Lifecycle */}
-          <section id="how-it-works" className="py-20 scroll-mt-20">
-            <WorkflowBar
-              isConnected={wallet.isConnected}
-              hasWitnessValue={Boolean(privateWitnessValue)}
-              isConfirmed={circuitCall.stage === 'confirmed'}
             />
           </section>
 
@@ -175,6 +198,13 @@ export function App() {
           <section id="security" className="scroll-mt-20">
             <PrivacyBreakdown />
           </section>
+
+          {/* Transparent product maturity and planned direction */}
+          <ProductScope />
+
+          {/* Lower-page product questions and focused next action */}
+          <FAQSection />
+          <LandingCTA onLaunchApp={navigateToApp} />
         </div>
       </main>
 

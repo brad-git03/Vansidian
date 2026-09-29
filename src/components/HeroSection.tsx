@@ -1,36 +1,51 @@
 import React from 'react';
-import { ArrowRight, Check, Fingerprint, LockKeyhole, ShieldCheck, Users } from 'lucide-react';
-interface HeroSectionProps { onConnectClick:()=>void; isConnected:boolean; isConnecting?:boolean; onLaunchApp:()=>void; }
-const people=[['SJ','Sarah Jenkins'],['DK','David Kim'],['ER','Elena Rostova'],['MV','Marcus Vance']];
-export const HeroSection:React.FC<HeroSectionProps>=({onConnectClick,isConnected,isConnecting,onLaunchApp})=><section id="hero" className="w-full px-3 pb-16 sm:px-5">
- <div className="relative mx-auto max-w-[1380px] overflow-hidden rounded-b-[30px] border border-white/[.07] bg-[#0c0d14] px-5 pb-8 pt-14 sm:px-10 sm:pt-20 lg:px-14">
-  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_72%_22%,rgba(118,87,246,.22),transparent_34%),radial-gradient(circle_at_10%_0%,rgba(50,183,124,.08),transparent_25%)]"/>
-  <div className="pointer-events-none absolute inset-0 opacity-[.035] bg-[linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] bg-[size:56px_56px]"/>
-  <img src="/vansidian-logo-v2.png" alt="" aria-hidden="true" className="hero-shield-watermark pointer-events-none absolute -right-[8%] top-[2%] w-[58%] max-w-[780px] opacity-[.075]"/>
-  <div className="relative grid items-center gap-14 lg:grid-cols-[.95fr_1.05fr]">
-   <div className="max-w-2xl"><div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[.05] px-3 py-1.5 text-xs text-[#c7bcff]"><ShieldCheck className="h-3.5 w-3.5"/>Private finance, publicly verifiable</div>
-    <h1 className="text-5xl font-medium leading-[1.02] tracking-[-.055em] text-white sm:text-6xl lg:text-[76px]">Payroll privacy<br/><span className="bg-gradient-to-r from-[#b7a8ff] via-[#8f78ff] to-[#63d6a4] bg-clip-text text-transparent">starts here.</span></h1>
-    <p className="mt-6 max-w-lg text-sm leading-6 text-[var(--text-muted)] sm:text-base">Run confidential payroll, prove every disbursement, and give auditors exactly what they need—without exposing employee compensation.</p>
-    <div className="mt-8 flex flex-col gap-3 sm:flex-row"><button onClick={onLaunchApp} className="app-button-primary flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold">Start a payroll run <ArrowRight className="h-4 w-4"/></button><a href="#settlements" className="app-button-secondary flex items-center justify-center rounded-full px-6 py-3 font-semibold">Live Settlements Feed ↓</a></div>
-    <div className="mt-4 flex items-center gap-2 text-xs text-[var(--text-muted)] flex-wrap">
-      <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-      <span>Live on Midnight Preprod · ZK-SNARK Verified ·</span>
-      <a href="#settlements" className="text-[#a995ff] hover:underline font-medium">Inspect On-Chain Proofs →</a>
+import { ArrowRight, CalendarDays, Check, FileText, Layers3, LockKeyhole, ShieldCheck, Users } from 'lucide-react';
+
+interface HeroSectionProps { onConnectClick: () => void; isConnected: boolean; isConnecting?: boolean; onLaunchApp: () => void; }
+
+const recipients = ['emp_7a3f...9c2d', 'emp_9b1e...4f77', 'emp_c4d2...8a1e', 'emp_6e90...3b5c', 'emp_f2a7...1d9b'];
+
+const SummaryCard = ({ icon: Icon, value, label }: { icon: React.ElementType; value: string; label: string }) => <div className="flex min-w-0 items-center gap-3 rounded-md border border-[#273657] bg-[#111c36] px-3 py-3">
+  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-[#172447] text-[#aeb8ff]"><Icon className="h-5 w-5" /></span>
+  <div className="min-w-0"><p className="text-lg font-semibold leading-none text-white">{value}</p><p className="mt-1 truncate text-xs text-[#a5b2d7]">{label}</p></div>
+</div>;
+
+export const HeroSection: React.FC<HeroSectionProps> = ({ onLaunchApp }) => <section id="hero" className="w-full border-b border-[#243150] bg-[#081126]">
+  <div className="relative overflow-hidden">
+    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_54%_38%,rgba(67,75,188,.2),transparent_36%),radial-gradient(circle_at_22%_55%,rgba(58,48,148,.13),transparent_34%)]" />
+    <div className="pointer-events-none absolute left-[42%] top-0 h-full w-[28%] skew-x-[-23deg] bg-gradient-to-br from-[#17265a]/50 to-transparent" />
+    <div className="relative mx-auto grid max-w-[1324px] items-center gap-14 px-5 py-10 sm:px-7 lg:min-h-[520px] lg:grid-cols-[1fr_1.12fr] lg:py-7">
+      <div className="max-w-[620px]">
+        <p className="text-[11px] font-semibold uppercase tracking-[.31em] text-[#9b87ff]">Private payroll&nbsp;&nbsp;•&nbsp;&nbsp;public proof</p>
+        <h1 className="mt-5 text-[52px] font-bold leading-[.98] tracking-[-.055em] text-white sm:text-[68px] lg:text-[76px]">Payroll privacy,<br/><span className="bg-gradient-to-b from-[#8b72ff] to-[#5e43ec] bg-clip-text text-transparent">proven.</span></h1>
+        <p className="mt-7 max-w-[570px] text-lg leading-[1.55] text-[#aeb9dc] sm:text-xl">Run confidential payroll and verify every disbursement<br className="hidden xl:block" /> without exposing employee compensation.</p>
+        <div className="mt-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:gap-9">
+          <button onClick={onLaunchApp} className="flex h-14 items-center justify-center gap-3 rounded-md bg-gradient-to-r from-[#5a3ff0] to-[#765cff] px-8 text-base font-semibold text-white shadow-[0_12px_34px_rgba(83,57,236,.28)] transition hover:brightness-110">Start a payroll run <ArrowRight className="h-4 w-4" /></button>
+          <a href="#settlements" className="flex items-center gap-3 text-base font-medium text-[#9d88ff] hover:text-[#b5a7ff]">View live settlements <ArrowRight className="h-4 w-4" /></a>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-[#263557] bg-[#0b162d]/85 p-3 shadow-[0_28px_90px_rgba(0,0,0,.24)]" aria-label="September payroll preview">
+        <div className="rounded-lg border border-[#263657] bg-[#0b152b] p-4 sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-5"><h2 className="text-xl font-semibold">September payroll</h2><span className="flex items-center gap-2 text-xs text-[#2ee3cc]"><span className="h-3 w-3 rounded-full bg-[#25ddc6] shadow-[0_0_12px_rgba(37,221,198,.5)]" />Ready to prove</span></div>
+            <div className="sm:text-right"><p className="text-[11px] text-[#9ba8cc]">Total disbursement</p><p className="text-xl font-semibold leading-tight">$34,500.00</p></div>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3"><SummaryCard icon={Users} value="5" label="employees" /><SummaryCard icon={FileText} value="0" label="exceptions" /><SummaryCard icon={CalendarDays} value="Sep 30" label="pay date" /></div>
+          <div className="mt-3 overflow-x-auto rounded-md border border-[#243350]">
+            <div className="min-w-[500px]"><div className="grid grid-cols-[34px_1fr_120px_88px] bg-[#17213a] px-2 py-2 text-[10px] text-[#9facce]"><span>#</span><span>Recipient (anonymized)</span><span>Status</span><span className="text-right">Network fee</span></div>
+            {recipients.map((recipient, index) => <div key={recipient} className="grid grid-cols-[34px_1fr_120px_88px] items-center border-t border-[#202e4a] px-2 py-[7px] text-[11px] text-[#c3cbed]"><span>{index + 1}</span><span className="truncate">{recipient}</span><span className="flex items-center gap-2"><Check className="h-4 w-4 rounded-full bg-[#2ce0c7] p-[2px] text-[#08201f]" />Scheduled</span><span className="text-right">0.12 NIGHT</span></div>)}</div>
+          </div>
+          <div className="mt-3 flex items-center gap-4 rounded-md border border-[#17676f] bg-gradient-to-r from-[#0d3744]/80 to-[#101b33] px-4 py-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[35%] bg-[#28e2cc] text-[#062d31]"><ShieldCheck className="h-6 w-6" /></span>
+            <div className="min-w-0 flex-1"><p className="text-xs font-semibold text-white">Batch commitment verified</p><p className="mt-1 text-[10px] text-[#a9b7db]">A zero-knowledge proof confirms all disbursements without revealing amounts.</p></div>
+            <a href="#settlements" className="hidden items-center gap-2 text-[10px] text-[#b9c4ee] sm:flex">View proof <ArrowRight className="h-3 w-3" /></a>
+          </div>
+        </div>
+      </div>
     </div>
-    {!isConnected&&<button onClick={onConnectClick} disabled={isConnecting} className="mt-2 text-xs text-[var(--text-muted)] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity block">{isConnecting ? 'Waiting for Lace authorization…' : 'Connect a Lace wallet instead →'}</button>}
-   </div>
-   <div className="relative mx-auto w-full max-w-[620px] pb-10" aria-label="Vansidian workspace preview">
-    <div className="absolute -inset-8 rounded-full bg-[#7657f6]/10 blur-3xl"/>
-    <div className="relative ml-auto w-[92%] rounded-[28px] border border-white/10 bg-[#12141d]/90 p-3 shadow-[0_35px_90px_rgba(0,0,0,.45)] sm:w-[86%]">
-     <div className="overflow-hidden rounded-[20px] border border-white/[.07] bg-[#090b10]"><div className="flex items-center justify-between border-b border-white/[.07] px-5 py-4"><div><p className="text-xs text-[var(--text-muted)]">September payroll</p><p className="mt-1 text-xl font-semibold">$34,500.00</p></div><span className="rounded-full bg-[#32b77c]/10 px-2.5 py-1 text-[10px] text-[#73d7aa]">Ready to prove</span></div>
-      <div className="grid grid-cols-3 border-b border-white/[.07]"><div className="p-4"><p className="text-[10px] text-[var(--text-muted)]">Employees</p><p className="mt-1 font-semibold">5</p></div><div className="border-x border-white/[.07] p-4"><p className="text-[10px] text-[var(--text-muted)]">Exceptions</p><p className="mt-1 font-semibold">0</p></div><div className="p-4"><p className="text-[10px] text-[var(--text-muted)]">Pay date</p><p className="mt-1 font-semibold">Sep 30</p></div></div>
-      <div className="p-4">{people.map(([initials,name],i)=><div key={name} className="flex items-center justify-between border-b border-white/[.06] py-3 last:border-0"><div className="flex items-center gap-3"><span className="grid h-8 w-8 place-items-center rounded-full bg-[#7657f6]/15 text-[10px] text-[#b7a8ff]">{initials}</span><div><p className="text-xs font-medium">{name}</p><p className="text-[10px] text-[var(--text-muted)]">{['Engineering','Research','Product','Security'][i]}</p></div></div><span className="font-mono text-xs">${[9000,7800,6500,6000][i].toLocaleString()}</span></div>)}</div>
-     </div>
-    </div>
-    <div className="absolute bottom-0 left-0 w-[55%] rounded-2xl border border-[#8f78ff]/25 bg-[#171827]/95 p-4 shadow-2xl"><div className="flex items-center justify-between"><div><p className="text-[10px] text-[var(--text-muted)]">Proof progress</p><p className="mt-1 text-sm font-semibold">Commitment ready</p></div><Fingerprint className="h-6 w-6 text-[#a995ff]"/></div><div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/5"><div className="h-full w-[82%] rounded-full bg-gradient-to-r from-[#7657f6] to-[#32b77c]"/></div><div className="mt-3 flex justify-between text-[9px] text-[var(--text-muted)]"><span>Private inputs</span><span>82%</span></div></div>
-    <div className="absolute right-0 top-[36%] hidden rounded-xl border border-white/10 bg-[#f4f1ff] p-4 text-[#101118] shadow-xl sm:block"><p className="text-[9px] text-[#656779]">Batch commitment</p><p className="mt-1 font-mono text-xs font-semibold">0x91b7…ae42</p><div className="mt-3 flex items-center gap-1.5 text-[9px] text-[#24805a]"><Check className="h-3 w-3"/>Validated locally</div></div>
-   </div>
   </div>
-  <div className="relative mt-16 grid grid-cols-2 gap-6 border-t border-white/[.07] pt-8 sm:grid-cols-4">{[[LockKeyhole,'0','Plaintext leaks'],[Users,'5','Team members'],[Fingerprint,'1','Batch proof'],[ShieldCheck,'100%','Auditable']].map(([Icon,value,label])=><div key={String(label)} className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-[#7657f6]/12"><Icon className="h-4 w-4 text-[#b7a8ff]"/></span><div><p className="text-2xl font-medium tracking-tight">{String(value)}</p><p className="text-[10px] uppercase tracking-[.16em] text-[var(--text-muted)]">{String(label)}</p></div></div>)}</div>
- </div>
+  <div className="border-t border-[#243150]"><div className="mx-auto grid max-w-[1160px] divide-y divide-[#2a3856] px-5 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:px-7">
+    {[[LockKeyhole, 'Private by default', 'Compensation stays confidential\non and off chain.'], [Layers3, 'One batch proof', 'Verify an entire payroll run\nwith a single proof.'], [ShieldCheck, 'Auditor-ready evidence', 'Cryptographic records for compliance\nand reporting.']].map(([Icon, title, copy]) => <div key={String(title)} className="flex items-center gap-5 px-5 py-5 first:pl-0 last:pr-0 sm:justify-center"><Icon className="h-9 w-9 shrink-0 text-[#8068ff]" /><div><h3 className="text-sm font-semibold">{String(title)}</h3><p className="mt-1 whitespace-pre-line text-xs leading-[1.45] text-[#9fadd2]">{String(copy)}</p></div></div>)}
+  </div></div>
 </section>;

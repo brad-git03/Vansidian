@@ -25,17 +25,17 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
   };
 
   return (
-    <div className="w-full glass-panel rounded-2xl p-6 border border-slate-800 shadow-2xl">
-      <div className="flex items-center justify-between mb-4">
+    <div className="wallet-connect-panel w-full overflow-hidden rounded-2xl border border-[#765eff]/25 p-5 sm:p-6">
+      <div className="flex items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-400">
+          <div className="rounded-xl border border-[#8069ff]/25 bg-[#765eff]/10 p-3 text-[#a995ff] shadow-[inset_0_1px_rgba(255,255,255,.04)]">
             <Wallet className="w-6 h-6" />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-white">
               {wallet.walletName || 'Lace'} Wallet Connector
             </h2>
-            <p className="text-xs text-slate-400">Midnight Network DApp Connector API v4</p>
+            <p className="mt-0.5 text-xs text-slate-400">Authorize payroll signing on Midnight Preprod</p>
           </div>
         </div>
 
@@ -145,7 +145,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
           <button
             onClick={onConnect}
             disabled={wallet.isConnecting}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-semibold text-sm shadow-lg shadow-indigo-600/20 transition-all duration-200 disabled:opacity-50 active:scale-[0.99] cursor-pointer"
+            className="app-button-primary w-full flex items-center justify-center gap-2 px-4 py-3.5 text-white rounded-xl font-semibold text-sm shadow-[0_12px_34px_rgba(103,76,244,.18)] transition-all duration-200 disabled:opacity-50 active:scale-[0.99] cursor-pointer"
           >
             <Wallet className="w-4 h-4" />
             {wallet.isConnecting ? 'Connecting to Lace...' : 'Connect Lace Wallet'}
