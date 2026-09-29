@@ -444,34 +444,8 @@ export function useMidnight() {
           throw new Error('Lace Wallet is not connected. Please connect Lace Wallet on Midnight Preprod to execute this circuit.');
         }
 
-        // Priority 1: Genuine On-Chain Broadcast via Midnight Proof Server & Lace (if container is online)
-        let onChainSuccess = false;
-        try {
-          const isPayrollBatch = Boolean(options?.batchRootHash || options?.totalAmount);
-          console.log('[Midnight Engine] Checking for active Midnight Proof Server on port 6300...');
-          const onChainRes = await executeOnChainContractCall(api, {
-            circuit: isPayrollBatch ? 'processPayrollBatch' : 'increment',
-            witnessValue: privateWitnessValue || 1,
-            totalAmount: options?.totalAmount,
-            employeeCount: options?.employeeCount,
-            batchRootHash: options?.batchRootHash,
-            onStageChange: (st) => setCircuitCall((prev) => ({ ...prev, stage: st })),
-          });
-
-          if (onChainRes?.txHash) {
-            txHashResult = onChainRes.txHash;
-            explorerUrlResult = onChainRes.explorerUrl;
-            onChainSuccess = true;
-            console.log('[Midnight Engine] Real on-chain transaction broadcasted successfully:', txHashResult);
-            setCircuitCall((prev) => ({ ...prev, stage: 'confirmed', txHash: txHashResult }));
-          }
-        } catch (onChainError: any) {
-          console.error('[Midnight Engine] On-chain proving encounter error:', onChainError);
-          throw onChainError;
-        }
-
-        // Priority 2: Pre-serialized Unsealed Transaction balancing (if serialized binary transaction is provided)
-        else if (
+        // Priority 1: Pre-serialized Unsealed Transaction balancing (if serialized binary transaction is provided)
+        if (
           typeof (api as any).balanceUnsealedTransaction === 'function' &&
           typeof (options as any)?.serializedTx === 'string' &&
           (options as any).serializedTx.startsWith('midnight:transaction')
@@ -488,7 +462,7 @@ export function useMidnight() {
           const formattedTx = txHashResult.startsWith('0x') ? txHashResult : `0x${txHashResult}`;
           explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/transactions/${formattedTx}`;
         }
-        // Optional fallback: Explicit direct token transfer if requested by user
+        // Priority 2: Explicit direct token transfer if requested by user
         else if (options?.isDirectTransfer && typeof api.makeTransfer === 'function') {
           setCircuitCall((prev) => ({ ...prev, stage: 'signing' }));
           const targetRecipient = options?.recipientAddress || wallet.address || 'mn_addr_preprod14g0smfdj6hjjkcd5hjh43xkra9q78zgfluqh7zzz6gy42y24f3jsc8chvm';
@@ -507,8 +481,28 @@ export function useMidnight() {
           const networkSubdomain = wallet.network === 'preview' ? 'preview' : 'preprod';
           const formattedTransferTx = txHashResult.startsWith('0x') ? txHashResult : `0x${txHashResult}`;
           explorerUrlResult = `https://${networkSubdomain}.midnightexplorer.com/transactions/${formattedTransferTx}`;
-        } else {
-          throw new Error('Lace Wallet does not support transaction authorization or contract signing.');
+        }
+        // Priority 3: Genuine On-Chain Contract Proving & Balancing via Proof Server & Lace DApp Connector
+        else {
+          const isPayrollBatch = Boolean(options?.batchRootHash || options?.totalAmount);
+          console.log('[Midnight Engine] Checking for active Midnight Proof Server on port 6300...');
+          const onChainRes = await executeOnChainContractCall(api, {
+            circuit: isPayrollBatch ? 'processPayrollBatch' : 'increment',
+            witnessValue: privateWitnessValue || 1,
+            totalAmount: options?.totalAmount,
+            employeeCount: options?.employeeCount,
+            batchRootHash: options?.batchRootHash,
+            onStageChange: (st) => setCircuitCall((prev) => ({ ...prev, stage: st })),
+          });
+
+          if (onChainRes?.txHash) {
+            txHashResult = onChainRes.txHash;
+            explorerUrlResult = onChainRes.explorerUrl;
+            console.log('[Midnight Engine] Real on-chain transaction broadcasted successfully:', txHashResult);
+            setCircuitCall((prev) => ({ ...prev, stage: 'confirmed', txHash: txHashResult }));
+          } else {
+            throw new Error('On-chain contract invocation did not return a valid transaction hash.');
+          }
         }
 
         const addedVal = privateWitnessValue || 1;
@@ -591,5 +585,15 @@ export function useMidnight() {
     disconnectWallet,
     executeCircuitCall,
     checkWalletInstalled,
+    /**
+     * Authorize arbitrary payloads or cryptographic intent signatures via Midnight Lace signData API
+     */
+    signData: async (payload: string) => {
+      const api = connectedApiRef.current;
+      if (api && typeof api.signData === 'function') {
+        return await api.signData(payload);
+      }
+      return null;
+    },
   };
 }
